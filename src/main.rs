@@ -1,4 +1,4 @@
-use chrono::{Local, DateTime, Utc};
+use chrono::{Local, DateTime};
 use reqwest;
 use serde::{Deserialize, Serialize};
 
@@ -26,16 +26,18 @@ struct HourlyWeather {
 
 fn hourlyweather(_hourly: &Vec<String>, _temp: &Vec<f64>) {
     let _local_now: DateTime<Local> = chrono::Local::now();
-    let _utc_now =  Utc::now();
 }
 
-fn currentweather(datetime: &str, temp: &f64) {
-    let date = &datetime[0..10];
-    let time = &datetime[11..];
+fn currentweather(datetime: &str, _temp: &f64) {
+    let _date = &datetime[0..10];
+    let _time = &datetime[11..];
+    let rfc = DateTime::parse_from_rfc3339(&datetime)
+        .timezone();
+    println!("{}", rfc);
 
-    println!("Todays Date: {}", date);
-    println!("Current Weather: {}°F", temp);
-    println!("Last checked at {}", time);
+   // println!("Todays Date: {}", date);
+   // println!("Current Weather: {}°F", temp);
+   // println!("Last checked at {}", time);
 }
 
 #[tokio::main]
