@@ -36,30 +36,19 @@ fn hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>, local: &DateTime<Local>)
             .single()
             .expect("[ERR]: Invalid time input. -> :");
 
+
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
                 println!("{}", naivelocal.time());
             }
         }
-    }
-}
+        for num in 0..hourly.len() {
+            println!("{}", hour);
+        }  
+    }   
+}   
 
-fn currentweather(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {
-    let _datestring = "%Y-%m-%dT%H:%M";
-    let _naive_dt = NaiveDateTime::parse_from_str(&_datetime, _datestring)
-        .expect("[ERR]: Could Not Parse DateTime -> :");
-
-    let _local_dt = Local
-        .from_local_datetime(&_naive_dt)
-        .single()
-        .expect("[ERR]: Invalid time input. -> :");
-
-    let _now_time = Local::now();
-
-    // println!("Todays Date: {}", datetime);
-    // println!("Current Weather: {}°F", ctemp);
-    // println!("Last checked at {}", time);
-}
+fn currentweather(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {}
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
