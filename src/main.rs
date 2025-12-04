@@ -26,27 +26,32 @@ struct HourlyWeather {
 
 fn hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>, local: &DateTime<Local>) {
     let datestring = "%Y-%m-%dT%H:%M";
+    let temp_iter = temp.iter();
 
+    for temps in temp {
+        println!("{}", temps);
+    }
+
+    // rewrite this to use the index, which will give temp
     for hour in hourly {
+        // String -> NaiveDateTime
         let naivedate = NaiveDateTime::parse_from_str(hour, datestring)
             .expect("[ERR] Error parsing Vec<T> -> :");
 
+        // NaiveDateTime -> DateTime<Local>
         let naivelocal = Local
             .from_local_datetime(&naivedate)
             .single()
-            .expect("[ERR]: Invalid time input. -> :");
+            .expect("[ERR]: Invalid time input. -> :"); 
 
-
+        // Compares DateTime to Local
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
                 println!("{}", naivelocal.time());
             }
         }
-        for num in 0..hourly.len() {
-            println!("{}", hour);
-        }  
-    }   
-}   
+    }
+}
 
 fn currentweather(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {}
 
