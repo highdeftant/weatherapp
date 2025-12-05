@@ -33,10 +33,13 @@ struct OpmStatus {
     StatusType: String,
 }
 
-fn showopm(status: &str, extended: &str,  location: &str, short: &str) {
-    println("---- OPM Status ----")
-    println("   Status: {}", status);
-        
+fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) {
+    println!("---- OPM Status ----");
+    println!("");
+    println!("Location: {}", location);
+    println!("Status: {}", status);
+    println!("Information: {}", shortmessage);
+    println!("Extended:{}", extendedinfo);
 }
 
 fn hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>, local: &DateTime<Local>) {
@@ -45,10 +48,9 @@ fn hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>, local: &DateTime<Local>)
     let mut num = 0;
 
     // rewrite this to use the index, which will give temp
-    println!("Hourly Forecast ----");
-    println!("|");
-    println!("|");
-    println!("|");
+    println!("");
+    println!("Hourly Forecast");
+    println!("---------------");
     for hour in hourly {
         num += 1;
         // String -> NaiveDateTime
@@ -64,46 +66,50 @@ fn hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>, local: &DateTime<Local>)
         // Compares DateTime to Local
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
-                println!("{} @ {}", temp[num], naivelocal.time());
+                println!("{}° @ {}", temp[num], naivelocal.time());
             }
         }
     }
+    println!("---------------");
 }
 
 fn currentweather(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {}
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
-    let endpoint = String::from("https://api.open-meteo.com/v1/forecast?latitude=38.8951&longitude=-77.0364&hourly=temperature_2m&current=temperature_2m,rain&timezone=America%2FNew_York&temperature_unit=fahrenheit");
+    let weatherendpoint = String::from("https://api.open-meteo.com/v1/forecast?latitude=38.8951&longitude=-77.0364&hourly=temperature_2m&current=temperature_2m,rain&timezone=America%2FNew_York&temperature_unit=fahrenheit");
 
-    let opmstat = String::from("https://www.opm.gov/json/operatingstatus.json");
+    let opmendpoint = String::from("https://www.opm.gov/json/operatingstatus.json");
 
-    let req: WeatherResponse = reqwest::Client::new()
-        .get(endpoint)
+    let weatherinfo: WeatherResponse = reqwest::Client::new()
+        .get(weatherendpoint)
         .send()
         .await?
         .json()
         .await?;
 
-    let stat: OpmStatus = reqwest::Client::new()
-        .get(opmstat)
+    let opm_status: OpmStatus = reqwest::Client::new()
+        .get(opmendpoint)
         .send()
         .await?
         .json()
         .await?;
 
     let local = chrono::Local::now();
-    let htime = req.hourly.time;
-    let htemp = req.hourly.temperature_2m;
-    let ctime = req.current.time;
-    let ctemp = req.current.temperature_2m;
+    let htime = weatherinfo.hourly.time;
+    let htemp = weatherinfo.hourly.temperature_2m;
+    let ctime = weatherinfo.current.time;
+    let ctemp = weatherinfo.current.temperature_2m;
 
 
-    let location = opm.Location;
-    let stat = opm.StatusType
+    let stat = opm_status.StatusType;
+    let location = opm_status.Location;
+    let shortmessage = opm_status.ShortStatusMessage;
+    let extendedinfo = opm_status.ExtendedInformation;
 
     //currentweather(&ctime, &ctemp, &local);
     hourlyweather(&htime, &htemp, &local);
+    showopm(&location, &shortmessage, &extendedinfo, &stat);
 
     Ok(())
 }
