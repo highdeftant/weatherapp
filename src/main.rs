@@ -34,23 +34,26 @@ struct OpmStatus {
 }
 
 fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) {
-    println!("---- OPM Status ----");
     println!("");
+    println!("---- OPM Status ----");
     println!("Location: {}", location);
     println!("Status: {}", status);
     println!("Information: {}", shortmessage);
     println!("Extended:{}", extendedinfo);
+    println!("");
 }
 
 fn hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>, local: &DateTime<Local>) {
     let datestring = "%Y-%m-%dT%H:%M";
     let temp_iter = temp.iter();
     let mut num = 0;
-
+    let mut next = 0;
     // rewrite this to use the index, which will give temp
     println!("");
     println!("Hourly Forecast");
     println!("---------------");
+    println!("");
+
     for hour in hourly {
         num += 1;
         // String -> NaiveDateTime
@@ -66,10 +69,12 @@ fn hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>, local: &DateTime<Local>)
         // Compares DateTime to Local
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
-                println!("{}° @ {}", temp[num], naivelocal.time());
+                next += 1;
+                println!("{}° at {}", temp[num], naivelocal.time());
             }
         }
     }
+    println!("");
     println!("---------------");
 }
 
@@ -100,7 +105,6 @@ async fn main() -> Result<(), reqwest::Error> {
     let htemp = weatherinfo.hourly.temperature_2m;
     let ctime = weatherinfo.current.time;
     let ctemp = weatherinfo.current.temperature_2m;
-
 
     let stat = opm_status.StatusType;
     let location = opm_status.Location;
