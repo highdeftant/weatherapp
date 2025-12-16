@@ -1,47 +1,10 @@
+mod weather;
+mod opmstatus;
+
+use opmstatus::showopm;
+use weather::{WeatherResponse, CurrentWeather, HourlyWeather, OpmStatus};
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
 use reqwest;
-use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize, Debug)]
-struct WeatherResponse {
-    latitude: f64,
-    longitude: f64,
-    current: CurrentWeather,
-    hourly: HourlyWeather,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct CurrentWeather {
-    time: String,
-    interval: i64,
-    temperature_2m: f64,
-    rain: f64,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct HourlyWeather {
-    time: Vec<String>,
-    temperature_2m: Vec<f64>,
-}
-
-// OPM Status
-#[derive(Serialize, Deserialize, Debug)]
-struct OpmStatus {
-    Location: String,
-    ShortStatusMessage: String,
-    ExtendedInformation: String,
-    StatusType: String,
-}
-
-fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) {
-    println!("");
-    println!("---- OPM Status ----");
-    println!("Location: {}", location);
-    println!("Status: {}", status);
-    println!("Information: {}", shortmessage);
-    println!("Extended:{}", extendedinfo);
-    println!("");
-}
 
 fn hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>, local: &DateTime<Local>) {
     let datestring = "%Y-%m-%dT%H:%M";
@@ -100,12 +63,15 @@ async fn main() -> Result<(), reqwest::Error> {
         .json()
         .await?;
 
+
+    // Weather info
     let local = chrono::Local::now();
     let htime = weatherinfo.hourly.time;
     let htemp = weatherinfo.hourly.temperature_2m;
     let ctime = weatherinfo.current.time;
     let ctemp = weatherinfo.current.temperature_2m;
 
+    // OPM Status
     let stat = opm_status.StatusType;
     let location = opm_status.Location;
     let shortmessage = opm_status.ShortStatusMessage;
