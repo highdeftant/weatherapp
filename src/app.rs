@@ -13,7 +13,7 @@ use ratatui::{
 
 #[derive(Debug, Default)]
 pub struct App {
-    counter: u8,
+    weatherinfo: String,
     exit: bool,
 };
 
@@ -29,7 +29,7 @@ impl App {
     }
 
     fn draw(&self, frame: &mut Frame) {
-        todo!()
+        frame.render_widget(self, frame.arena());
     }
 
     fn handle_events(&mut self) -> io::Result<()> {
@@ -37,19 +37,27 @@ impl App {
     }
 };
 
-
+// ANCHOR: Widget for App
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let title = Line::from(" Weather App v0.0.5b ").bold());
         let instructions = Line::from(vec![
             " Quit ".into(),
-            " <Q> ".blue().bold();
+            " <Q> ".blue().bold(),
+            " Refresh ".into(),
+            " <R> ".into(),
         ]);
 
+        // Create Border line
         let block = Block::bordererd()
             .title(title.centered())
             .title_bottom(instructions.centered())
             .border_set(border::THICK);
+        
+    let weather_text = Text::from(vec![Line::from(vec![
+            "Current Weather: ".into(),
+            self.counter.to_string().yellow(),
+    ])])
 
         Paragraph::new(counter_text)
             .centered()

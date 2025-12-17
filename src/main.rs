@@ -1,6 +1,8 @@
 mod weather;
 mod opmstatus;
+mod app;
 
+use app
 use opmstatus::showopm;
 use weather::{WeatherResponse, CurrentWeather, HourlyWeather, OpmStatus};
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
@@ -45,6 +47,7 @@ fn currentweather(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {}
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
+    color_eyre::install()?;
     let weatherendpoint = String::from("https://api.open-meteo.com/v1/forecast?latitude=38.8951&longitude=-77.0364&hourly=temperature_2m&current=temperature_2m,rain&timezone=America%2FNew_York&temperature_unit=fahrenheit");
 
     let opmendpoint = String::from("https://www.opm.gov/json/operatingstatus.json");
@@ -63,7 +66,6 @@ async fn main() -> Result<(), reqwest::Error> {
         .json()
         .await?;
 
-
     // Weather info
     let local = chrono::Local::now();
     let htime = weatherinfo.hourly.time;
@@ -80,6 +82,11 @@ async fn main() -> Result<(), reqwest::Error> {
     //currentweather(&ctime, &ctemp, &local);
     hourlyweather(&htime, &htemp, &local);
     showopm(&location, &shortmessage, &extendedinfo, &stat);
+
+    let mut terminal = ratatui::init();
+    let app_result = App::default().run(&mut terminal);
+    ratatui::restore();
+    app_result
 
     Ok(())
 }
