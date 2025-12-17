@@ -1,1 +1,1 @@
-/home/gh0st/Labs/gitrepos/rust/weatherapp/target/debug/weatherapp: /home/gh0st/Labs/gitrepos/rust/weatherapp/src/main.rs /home/gh0st/Labs/gitrepos/rust/weatherapp/src/opmstatus.rs /home/gh0st/Labs/gitrepos/rust/weatherapp/src/weather.rs
+/home/gh0st/Labs/gitrepos/rusty/weatherapp/target/debug/weatherapp: /home/gh0st/Labs/gitrepos/rusty/weatherapp/src/main.rs /home/gh0st/Labs/gitrepos/rusty/weatherapp/src/opmstatus.rs /home/gh0st/Labs/gitrepos/rusty/weatherapp/src/weather.rs
