@@ -1,23 +1,21 @@
 mod ui;
 mod getweather;
-mod opmstatus;
 mod weather;
 
 use crate::{ui::App, getweather::{get_hourlyweather, get_currentweather, showopm}};
 use color_eyre;
 use ratatui;
 use reqwest;
-use std::io;
 use weather::{CurrentWeather, HourlyWeather, OpmStatus, WeatherResponse};
 
-//fn runterm() -> Result<()> {
-//    color_eyre::install()?;
-//    let mut terminal = ratatui::init();
-//    let app_result = App::default().run(&mut terminal);
-//    ratatui::restore();
-//    app_result;
-//    Ok(())
-//}
+fn runterm() -> color_eyre::eyre::Result<()> {
+    color_eyre::install()?;
+    let mut terminal = ratatui::init();
+    let app_result = App::default().run(&mut terminal);
+    ratatui::restore();
+    app_result;
+    Ok(())
+}
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
@@ -54,5 +52,6 @@ async fn main() -> Result<(), reqwest::Error> {
     //currentweather(&ctime, &ctemp, &local);
     get_hourlyweather(&htime, &htemp);
     showopm(&location, &shortmessage, &extendedinfo, &stat);
+    runterm();
     Ok(())
 }
