@@ -15,7 +15,7 @@ use ratatui::{
 pub struct App {
     weatherinfo: String,
     exit: bool,
-};
+}
 
 
 impl App {
@@ -29,39 +29,39 @@ impl App {
     }
 
     fn draw(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.arena());
+        frame.render_widget(self, frame.area());
     }
 
     fn handle_events(&mut self) -> io::Result<()> {
         todo!()
     }
-};
+}
 
 // ANCHOR: Widget for App
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let title = Line::from(" Weather App v0.0.5b ").bold());
+        let title = Line::from(" Weather App v0.0.5b ").bold();
         let instructions = Line::from(vec![
             " Quit ".into(),
             " <Q> ".blue().bold(),
             " Refresh ".into(),
             " <R> ".into(),
-        ]);
+    ]);
 
         // Create Border line
-        let block = Block::bordererd()
+        let block = Block::bordered()
             .title(title.centered())
             .title_bottom(instructions.centered())
             .border_set(border::THICK);
         
-    let weather_text = Text::from(vec![Line::from(vec![
+        let weather_text = Text::from(vec![Line::from(vec![
             "Current Weather: ".into(),
-            self.counter.to_string().yellow(),
-    ])])
+            self.weatherinfo.to_string().yellow(),
+    ])]);
 
-        Paragraph::new(counter_text)
+        Paragraph::new(weather_text)
             .centered()
             .block(block)
             .render(area,buf);
     }
-};
+}
