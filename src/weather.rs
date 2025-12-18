@@ -30,4 +30,3 @@ pub struct OpmStatus {
    pub ExtendedInformation: String,
    pub StatusType: String,
 }
-
