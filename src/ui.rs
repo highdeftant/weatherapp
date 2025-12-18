@@ -1,5 +1,10 @@
+mod weather;
+
+
+
 use std::io;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use weather::{CurrentWeather, HourlyWeather, OpmStatus, WeatherResponse};
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
@@ -50,10 +55,6 @@ impl App {
     fn exit(&mut self) {
         self.exit = true;
     }
-    //fn refresh(&mut self) -> io::Result<()> {
-    //    terminal.draw(|frame| self.draw(frame))?;
-    //    self.handle_events()?;
-    //}
 }
 
 // ANCHOR: Widget for App
