@@ -1,1 +1,0 @@
-/home/gh0st/Labs/gitrepos/rust/weatherapp/target/debug/weatherapp: /home/gh0st/Labs/gitrepos/rust/weatherapp/src/getweather.rs /home/gh0st/Labs/gitrepos/rust/weatherapp/src/main.rs /home/gh0st/Labs/gitrepos/rust/weatherapp/src/ui.rs /home/gh0st/Labs/gitrepos/rust/weatherapp/src/weather.rs
