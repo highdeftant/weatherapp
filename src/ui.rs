@@ -1,10 +1,6 @@
-mod weather;
-
-
-
 use std::io;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use weather::{CurrentWeather, HourlyWeather, OpmStatus, WeatherResponse};
+use reqwest;
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
@@ -25,7 +21,7 @@ pub struct App {
 
 impl App {
 
-    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Box<dyn std::error::Error> {
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
@@ -60,7 +56,7 @@ impl App {
 // ANCHOR: Widget for App
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let title = Line::from(" Weather App v0.0.5b ").bold();
+        let title = Line::from(" Weather App v0.1.0b ").bold();
         let instructions = Line::from(vec![
             " Quit ".into(),
             " <Q> ".blue().bold(),
