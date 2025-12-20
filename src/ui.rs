@@ -21,7 +21,7 @@ pub struct App {
 
 impl App {
 
-    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Box<dyn std::error::Error> {
+    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
@@ -61,7 +61,7 @@ impl Widget for &App {
             " Quit ".into(),
             " <Q> ".blue().bold(),
             " Refresh ".into(),
-            " <R> ".into(),
+            " <R> ".blue().into(),
     ]);
 
         // Create Border line

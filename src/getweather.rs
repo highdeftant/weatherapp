@@ -1,15 +1,17 @@
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
+use std::collections::HashMap;
 
 pub fn get_currentweather(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {
     todo!();
 }
 
-pub fn get_hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>) {
+pub fn get_hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>) -> HashMap<String, String> {
     let datestring = "%Y-%m-%dT%H:%M";
     let local = chrono::Local::now();
     let temp_iter = temp.iter();
     let mut num = 0;
     let mut next = 0;
+    let mut next_hours = HashMap::new();
     // rewrite this to use the index, which will give temp
     println!("");
     println!("Hourly Forecast");
@@ -32,12 +34,11 @@ pub fn get_hourlyweather(hourly: &Vec<String>, temp: &Vec<f64>) {
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
                 next += 1;
-                println!("{}° at {}", temp[num], naivelocal.time());
+                next_hours.insert(temp[num].to_string(), naivelocal.time().to_string());
             }
         }
     }
-    println!("");
-    println!("---------------");
+    next_hours
 }
 
 pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) {
