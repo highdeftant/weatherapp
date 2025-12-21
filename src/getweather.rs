@@ -1,3 +1,5 @@
+
+use crate::ui::App;
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
 use std::collections::HashMap;
 
@@ -5,7 +7,7 @@ pub fn get_current(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {
     todo!();
 }
 
-pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> HashMap<String, String> {
+pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) {
     let datestring = "%Y-%m-%dT%H:%M";
     let local = chrono::Local::now();
     let temp_iter = temp.iter();
@@ -33,7 +35,7 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> HashMap<String, Stri
             }
         }
     }
-    next_hours
+    App::default().hourly_forecast(next_hours);
 }
 
 pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) -> String {
