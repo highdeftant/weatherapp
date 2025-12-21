@@ -1,4 +1,5 @@
 use std::io;
+use std::collections::HashMap;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use reqwest;
 use ratatui::{
@@ -14,7 +15,8 @@ use ratatui::{
 
 #[derive(Debug, Default)]
 pub struct App {
-    weatherinfo: String,
+    pub hourlyinfo: String, 
+    pub currentinfo: String,
     exit: bool,
 }
 
@@ -48,6 +50,11 @@ impl App {
             _ => {}
         };
     }
+    pub fn hourly_forecast(forecast: HashMap<String, String>) {
+        for (temp, hour) in &forecast {
+            let mut hourlytemp = format!("{temp} @ {hour}");
+        }
+    }
     fn exit(&mut self) {
         self.exit = true;
     }
@@ -72,7 +79,7 @@ impl Widget for &App {
         
         let weather_text = Text::from(vec![Line::from(vec![
             "Current Weather: ".into(),
-            self.weatherinfo.to_string().yellow(),
+            self.hourlyinfo.to_string().yellow(),
     ])]);
 
         Paragraph::new(weather_text)

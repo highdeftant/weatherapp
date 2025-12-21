@@ -2,7 +2,7 @@ mod ui;
 mod getweather;
 mod weather;
 
-use crate::{ui::App, getweather::{get_hourlyweather, get_currentweather, showopm}};
+use crate::{ui::App, getweather::{get_hourly, get_current, showopm}};
 use color_eyre;
 use ratatui;
 use reqwest;
@@ -49,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let extendedinfo = opm_status.ExtendedInformation;
 
     //currentweather(&ctime, &ctemp, &local);
-    get_hourlyweather(&htime, &htemp);
+    get_hourly(&htime, &htemp);
     showopm(&location, &shortmessage, &extendedinfo, &stat);
     runterm();
     Ok(())
