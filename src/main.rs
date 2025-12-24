@@ -51,6 +51,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //currentweather(&ctime, &ctemp, &local);
     get_hourly(&htime, &htemp);
     showopm(&location, &shortmessage, &extendedinfo, &stat);
-    runterm();
+    runterm()?;
     Ok(())
 }

@@ -14,7 +14,9 @@ use ratatui::{
 
 #[derive(Debug, Default)]
 pub struct App {
-    pub hourlyinfo: HashMap<String, String>, 
+    pub hourly_time: Vec<String>, 
+    pub hourly_temp: Vec<f64>,
+    pub hourly_string: String,
     pub currentinfo: String,
     pub opmstatus: String,
     exit: bool,
@@ -44,17 +46,18 @@ impl App {
         };
         Ok(())
     }
+
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
-            _ => {}
+            _ => {},
         };
     }
-    pub fn hourly_forecast(&mut self, forecast: HashMap<String, String>) {
-        for (temp, hour) in &forecast {
-            self.hourlyinfo.insert(temp.to_string(), hour.to_string());
-        }
+    fn show_hours(&mut self, hours: Vec<String>) -> String {
+        todo!();
     }
+
+
     fn exit(&mut self) {
         self.exit = true;
     }
@@ -78,8 +81,8 @@ impl Widget for &App {
             .border_set(border::THICK);
         
         let weather_text = Text::from(vec![Line::from(vec![
-            "Current Weather: ".into(),
-            self.hourlyinfo.into_string().yellow()
+                self.opmstatus.to_string().bold(),
+                
     ])]);
 
         Paragraph::new(weather_text)
