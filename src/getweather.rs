@@ -19,9 +19,8 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) {
     let local = chrono::Local::now();
     let mut num = 0;
     let mut next = 0;
-    let mut app = App::default();
-
-
+    let mut new_hours = String::new();
+    
     for hour in hourly {
         num += 1;
         // String -> NaiveDateTime
@@ -38,8 +37,8 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) {
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
                 next += 1;
-                app.hourly_temp.push(temp[num]);
-                app.hourly_time.push(naivelocal.time().to_string());
+                App::u.push("{} {}", temp[num], naivelocal.time().to_string());
+                &app.hourly_time.push(naivelocal.time().to_string());
             }
         }
     }
@@ -53,5 +52,6 @@ pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &
         Information: {shortmessage}
         Extended: {extendedinfo}"
     );
-   App::opmstatus = opm
+
+   let status = &mut App::upd_opm(&mut App::default(), opm);
 }

@@ -1,5 +1,4 @@
 use std::io;
-use std::collections::HashMap;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     buffer::Buffer,
@@ -14,11 +13,11 @@ use ratatui::{
 
 #[derive(Debug, Default)]
 pub struct App {
-    pub hourly_time: Vec<String>, 
-    pub hourly_temp: Vec<f64>,
-    pub hourly_string: String,
-    pub currentinfo: String,
-    pub opmstatus: String,
+    hourly_time: Vec<String>, 
+    hourly_temp: Vec<f64>,
+    hourly_string: String,
+    currentinfo: String,
+    opmstatus: String,
     exit: bool,
 }
 
@@ -53,10 +52,18 @@ impl App {
             _ => {},
         };
     }
-    fn show_hours(&mut self, hours: Vec<String>) -> String {
+
+    pub fn upd_opm(&mut self, opm: String) {
+        self.opmstatus = opm;
+    }
+
+    pub fn upd_current(&mut self, time: String, temp: f64) {
         todo!();
     }
 
+    pub fn upd_hours(&mut self, hours: Vec<String>) {
+        todo!();
+    }
 
     fn exit(&mut self) {
         self.exit = true;
