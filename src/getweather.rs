@@ -1,4 +1,3 @@
-use crate::ui::App;
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
 
 pub fn get_current(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {
@@ -14,7 +13,7 @@ pub fn get_current(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) {
     let _now_time = Local::now();
 }
 
-pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) {
+pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> String {
     let datestring = "%Y-%m-%dT%H:%M";
     let local = chrono::Local::now();
     let mut num = 0;
@@ -37,14 +36,14 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) {
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
                 next += 1;
-                App::u.push("{} {}", temp[num], naivelocal.time().to_string());
-                &app.hourly_time.push(naivelocal.time().to_string());
+                new_hours.push_str("{} at {}", temp[num].to_string(), naivelocal.time().to_string())
             }
         }
     }
+    new_hours
 }
 
-pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) {
+pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) -> String {
     let opm = format!(
         "
         Location: {location}
@@ -52,6 +51,5 @@ pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &
         Information: {shortmessage}
         Extended: {extendedinfo}"
     );
-
-   let status = &mut App::upd_opm(&mut App::default(), opm);
+    opm
 }

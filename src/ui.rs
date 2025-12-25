@@ -16,7 +16,7 @@ pub struct App {
     hourly_time: Vec<String>, 
     hourly_temp: Vec<f64>,
     hourly_string: String,
-    currentinfo: String,
+    current_time: String,
     opmstatus: String,
     exit: bool,
 }
@@ -57,8 +57,8 @@ impl App {
         self.opmstatus = opm;
     }
 
-    pub fn upd_current(&mut self, time: String, temp: f64) {
-        todo!();
+    pub fn upd_current(&mut self, time: String) {
+        self.current_time = time
     }
 
     pub fn upd_hours(&mut self, hours: Vec<String>) {
