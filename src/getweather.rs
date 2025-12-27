@@ -36,20 +36,19 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> String {
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
                 next += 1;
-                new_hours.push_str("{} at {}", temp[num].to_string(), naivelocal.time().to_string())
+                new_hours.push_str(&format!("{}°", temp[num]).to_string());
             }
         }
     }
     new_hours
 }
 
-pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) -> String {
-    let opm = format!(
-        "
-        Location: {location}
-        Status: {status}
-        Information: {shortmessage}
-        Extended: {extendedinfo}"
-    );
+pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) -> Vec<String> {
+    let mut opm: Vec<String> = vec![
+        format!("Location: {location}").to_string(),
+        format!("Status: {status}").to_string(),
+        format!("Information: {shortmessage}").to_string(),
+        format!("Extended: {extendedinfo}").to_string(),
+    ];
     opm
 }

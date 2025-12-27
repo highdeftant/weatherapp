@@ -15,9 +15,9 @@ use ratatui::{
 pub struct App {
     hourly_time: Vec<String>, 
     hourly_temp: Vec<f64>,
-    hourly_string: String,
     current_time: String,
     opmstatus: String,
+    opm: Vec<String>,
     exit: bool,
 }
 
@@ -53,16 +53,17 @@ impl App {
         };
     }
 
-    pub fn upd_opm(&mut self, opm: String) {
-        self.opmstatus = opm;
+    pub fn upd_opm(&mut self, opmstatus: Vec<String>) {
+        self.opm = opmstatus;
     }
 
-    pub fn upd_current(&mut self, time: String) {
+    pub fn upd_current(&mut self, time: Vec<String>) {
         self.current_time = time
     }
 
-    pub fn upd_hours(&mut self, hours: Vec<String>) {
-        todo!();
+    pub fn upd_hours(&mut self, hours: Vec<String>, temp, Vec<f64>) {
+        self.hourly_temp = hours;
+
     }
 
     fn exit(&mut self) {
@@ -88,7 +89,7 @@ impl Widget for &App {
             .border_set(border::THICK);
         
         let weather_text = Text::from(vec![Line::from(vec![
-                self.opmstatus.to_string().bold(),
+                self.opm[2].to_string().bold(),
                 
     ])]);
 
