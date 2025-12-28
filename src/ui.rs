@@ -6,7 +6,7 @@ use ratatui::{
     style::Stylize,
     symbols::border,
     text::{Line, Text},
-    widgets::{Block, Paragraph, Widget},
+    widgets::{Block, Paragraph, Widget, Wrap},
     DefaultTerminal, Frame,
 };
 
@@ -88,13 +88,17 @@ impl Widget for &App {
             .title_bottom(instructions.centered())
             .border_set(border::THICK);
         
-        let weather_text = Text::from(vec![Line::from(vec![
-                self.opm[2].to_string().bold(),
+        let weather_text = Text::from(vec![
+            Line::from(self.opm[0].to_string().bold()),
+            Line::from(self.opm[1].to_string().bold()),
+            Line::from(self.opm[2].to_string().bold()),
+            Line::from(self.opm[3].to_string().bold()),
+        ]);
                 
-    ])]);
 
         Paragraph::new(weather_text)
-            .centered()
+            .wrap(Wrap {trim: true})
+            .left_aligned()
             .block(block)
             .render(area,buf);
     }
