@@ -1,35 +1,39 @@
-use std::io;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
+    prelude::*,
     style::Stylize,
     symbols::border,
     text::{Line, Text},
     widgets::{Block, Paragraph, Widget, Wrap},
     DefaultTerminal, Frame,
 };
-
+use std::io;
 
 #[derive(Debug, Default)]
 pub struct App {
+<<<<<<< HEAD
     hourly_time: Vec<String>, 
     hourly_temp: Vec<f64>,
     current_time: String,
     opmstatus: String,
+=======
+    hourly_time: Vec<String>,
+    hourly_temp: String,
+    currentinfo: String,
+>>>>>>> e74776d (desktop changes)
     opm: Vec<String>,
     exit: bool,
 }
 
-
 impl App {
-
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         while !self.exit {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
         }
-        Ok(()) 
+        Ok(())
     }
 
     fn draw(&self, frame: &mut Frame) {
@@ -49,7 +53,7 @@ impl App {
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
-            _ => {},
+            _ => {}
         };
     }
 
@@ -73,33 +77,41 @@ impl App {
 
 // ANCHOR: Widget for App
 impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let title = Line::from(" Weather App v0.1.0b ").bold();
+    fn render(self, area: Rect, frame: &mut Frame, buf: &mut Buffer) {
+        //let layout = Layout::default()
+        //    .direction(Direction::Horizontal)
+        //    .constraints(vec![
+        //        Constraints::Percentage(50),
+        //        Constraints::Percentage(50),])
+        //    .split(frame.area());
+
+        let title = Line::from("OPM Status").bold();
         let instructions = Line::from(vec![
             " Quit ".into(),
             " <Q> ".blue().bold(),
             " Refresh ".into(),
             " <R> ".blue().into(),
-    ]);
+        ]);
 
         // Create Border line
         let block = Block::bordered()
             .title(title.centered())
             .title_bottom(instructions.centered())
             .border_set(border::THICK);
-        
+
         let weather_text = Text::from(vec![
             Line::from(self.opm[0].to_string().bold()),
             Line::from(self.opm[1].to_string().bold()),
             Line::from(self.opm[2].to_string().bold()),
             Line::from(self.opm[3].to_string().bold()),
         ]);
-                
 
-        Paragraph::new(weather_text)
-            .wrap(Wrap {trim: true})
-            .left_aligned()
-            .block(block)
-            .render(area,buf);
+        frame.render_widget(
+            Paragraph::new(weather_text)
+                .wrap(Wrap { trim: true })
+                .left_aligned()
+                .block(block)
+                .render(area, buf),
+        );
     }
 }
