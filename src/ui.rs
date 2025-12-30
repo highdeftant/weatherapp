@@ -13,16 +13,9 @@ use std::io;
 
 #[derive(Debug, Default)]
 pub struct App {
-<<<<<<< HEAD
     hourly_time: Vec<String>, 
     hourly_temp: Vec<f64>,
     current_time: String,
-    opmstatus: String,
-=======
-    hourly_time: Vec<String>,
-    hourly_temp: String,
-    currentinfo: String,
->>>>>>> e74776d (desktop changes)
     opm: Vec<String>,
     exit: bool,
 }
