@@ -15,7 +15,7 @@ use std::io;
 pub struct App {
     hourly_time: Vec<String>, 
     hourly_temp: Vec<f64>,
-    current_time: String,
+    current_time: Vec<String>,
     opm: Vec<String>,
     exit: bool,
 }
@@ -58,8 +58,8 @@ impl App {
         self.current_time = time
     }
 
-    pub fn upd_hours(&mut self, hours: Vec<String>, temp, Vec<f64>) {
-        self.hourly_temp = hours;
+    pub fn upd_hours(&mut self, hours: Vec<String>, temp: Vec<f64>) {
+        self.hourly_time = hours;
 
     }
 
@@ -70,14 +70,7 @@ impl App {
 
 // ANCHOR: Widget for App
 impl Widget for &App {
-    fn render(self, area: Rect, frame: &mut Frame, buf: &mut Buffer) {
-        //let layout = Layout::default()
-        //    .direction(Direction::Horizontal)
-        //    .constraints(vec![
-        //        Constraints::Percentage(50),
-        //        Constraints::Percentage(50),])
-        //    .split(frame.area());
-
+    fn render(self, area: Rect, buf: &mut Buffer) {
         let title = Line::from("OPM Status").bold();
         let instructions = Line::from(vec![
             " Quit ".into(),
@@ -86,25 +79,47 @@ impl Widget for &App {
             " <R> ".blue().into(),
         ]);
 
-        // Create Border line
-        let block = Block::bordered()
-            .title(title.centered())
-            .title_bottom(instructions.centered())
-            .border_set(border::THICK);
-
-        let weather_text = Text::from(vec![
+        let opm_body = Text::from(vec![
             Line::from(self.opm[0].to_string().bold()),
             Line::from(self.opm[1].to_string().bold()),
             Line::from(self.opm[2].to_string().bold()),
             Line::from(self.opm[3].to_string().bold()),
         ]);
 
-        frame.render_widget(
-            Paragraph::new(weather_text)
-                .wrap(Wrap { trim: true })
-                .left_aligned()
-                .block(block)
-                .render(area, buf),
-        );
+        //
+        //
+        let opmblock = Paragraph::new(opm_body)
+            .wrap(Wrap {trim: true})
+            .left_aligned()
+            .block(
+                Block::bordered()
+                .title(title.centered())
+                .border_set(border::THICK),
+            );
+
+        // Main Layout
+        let outer_layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Min(10), // Main Container
+                Constraint::Length(3), // Footer
+            ])
+            .split(area);
+        //
+        //
+        // Inner Layout
+        let main_layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Length(3),
+                Constraint::Min(5),
+            ])
+            .split(outer_layout[0]);
+
+        // Create Border line
+        let block = Block::bordered()
+            .title("OPM Status")
+            .title_bottom(instructions.centered())
+            .border_set(border::THICK);
     }
 }

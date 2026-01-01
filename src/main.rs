@@ -1,8 +1,11 @@
-mod ui;
 mod getweather;
+mod ui;
 mod weather;
 
-use crate::{ui::App, getweather::{get_hourly, get_current, showopm}};
+use crate::{
+    getweather::{get_current, get_hourly, showopm},
+    ui::App,
+};
 use color_eyre;
 use ratatui;
 use reqwest;
@@ -46,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal = ratatui::init();
     let mut app = App::default();
     app.upd_opm(opm);
-    app.upd_hours(hours);
+    //    app.upd_hours(hours);
     let result = app.run(&mut terminal);
     ratatui::restore();
     result?;
