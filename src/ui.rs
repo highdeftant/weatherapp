@@ -121,5 +121,7 @@ impl Widget for &App {
             .title("OPM Status")
             .title_bottom(instructions.centered())
             .border_set(border::THICK);
+        
+        Frame::render_widget(opmblock, outer_layout[1])
     }
 }
