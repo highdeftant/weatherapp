@@ -49,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal = ratatui::init();
     let mut app = App::default();
     app.upd_opm(opm);
-    //    app.upd_hours(hours);
+    app.upd_hours(hours);
     let result = app.run(&mut terminal);
     ratatui::restore();
     result?;

@@ -14,7 +14,7 @@ use std::io;
 #[derive(Debug, Default)]
 pub struct App {
     hourly_time: Vec<String>, 
-    hourly_temp: Vec<f64>,
+    hourly_temp: Vec<String>,
     current_time: Vec<String>,
     opm: Vec<String>,
     exit: bool,
@@ -58,8 +58,9 @@ impl App {
         self.current_time = time
     }
 
-    pub fn upd_hours(&mut self, hours: Vec<String>, temp: Vec<f64>) {
-        self.hourly_time = hours;
+    pub fn upd_hours(&mut self, hour_temp: (Vec<String>, Vec<String>)) {
+        self.hourly_temp = hour_temp.1;
+        self.hourly_time = hour_temp.0;
 
     }
 
@@ -70,8 +71,17 @@ impl App {
 
 // ANCHOR: Widget for App
 impl Widget for &App {
+
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let title = Line::from("OPM Status").bold();
+        let opm_title = Line::from("OPM Status").bold();
+        let hour_title = Line::from("Hourly").bold();
+        let current_title = Line::from("Current").bold();
+        let header_title = Line::from("Header").bold();
+        let dashboard_title = Line::from("Dashboard").bold();
+        let footer_title = Line::from("Footer").bold();
+
+        let footer_body = Line::from("Developed by Spoofydude").bold();
+
         let instructions = Line::from(vec![
             " Quit ".into(),
             " <Q> ".blue().bold(),
@@ -79,6 +89,27 @@ impl Widget for &App {
             " <R> ".blue().into(),
         ]);
 
+        // Main Layout
+        let outer_layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Length(3), // Header
+                Constraint::Min(10), // Main Container
+                Constraint::Length(3), // Footer
+            ])
+            .split(area);
+
+        // Inner Layout
+        let main_layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Min(2),
+                Constraint::Min(2),
+            ])
+            .split(outer_layout[1]);
+        //
+        //
+        // OPM Status Information
         let opm_body = Text::from(vec![
             Line::from(self.opm[0].to_string().bold()),
             Line::from(self.opm[1].to_string().bold()),
@@ -86,42 +117,68 @@ impl Widget for &App {
             Line::from(self.opm[3].to_string().bold()),
         ]);
 
+        let hour_body = Text::from(vec![
+            Line::from(self.hourly_time[0].to_string().bold()),
+            Line::from(self.hourly_time[1].to_string().bold()),
+            Line::from(self.hourly_time[2].to_string().bold()),
+            Line::from(format!("{:?}", self.hourly_time).to_string().bold()),
+        ]);
+
+        // Layout Information
         //
-        //
+        // Body
+
         let opmblock = Paragraph::new(opm_body)
             .wrap(Wrap {trim: true})
             .left_aligned()
             .block(
                 Block::bordered()
-                .title(title.centered())
-                .border_set(border::THICK),
-            );
+                .title(opm_title.centered())
+                .border_set(border::THICK)
+            )
+            .render(main_layout[1], buf);
 
-        // Main Layout
-        let outer_layout = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Min(10), // Main Container
-                Constraint::Length(3), // Footer
-            ])
-            .split(area);
-        //
-        //
-        // Inner Layout
-        let main_layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([
-                Constraint::Length(3),
-                Constraint::Min(5),
-            ])
-            .split(outer_layout[0]);
+       // let currentweather = Paragraph::new("Current")
+       //     .wrap(Wrap {trim: true})
+       //     .left_aligned()
+       //     .block(
+       //         Block::bordered()
+       //         .title(current_title.left_aligned())
+       //         .border_set(border::THICK)
+       //     )
+       //     .render(main_layout[0], buf);
+       // 
+        let hourlyweather = Paragraph::new(hour_body)
+            .wrap(Wrap {trim: true})
+            .left_aligned()
+            .block(
+                Block::bordered()
+                .title(hour_title.centered())
+                .border_set(border::THICK)
+            )
+            .render(main_layout[0], buf);
 
-        // Create Border line
-        let block = Block::bordered()
-            .title("OPM Status")
-            .title_bottom(instructions.centered())
-            .border_set(border::THICK);
+        // Header, Footer
         
-        Frame::render_widget(opmblock, outer_layout[1])
+        let header = Paragraph::new("Header Text")
+            .wrap(Wrap {trim: true})
+            .left_aligned()
+            .block(
+                Block::bordered()
+                .title(header_title.centered())
+                .border_set(border::THICK)
+            )
+            .render(outer_layout[0], buf);
+        
+        let footer = Paragraph::new(footer_body)
+            .wrap(Wrap {trim: true})
+            .left_aligned()
+            .block(
+                Block::bordered()
+                .title(footer_title.centered())
+                .title_bottom(instructions.centered())
+                .border_set(border::THICK)
+            )
+            .render(outer_layout[2], buf);
     }
 }
