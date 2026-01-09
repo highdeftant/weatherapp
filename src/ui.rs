@@ -1,4 +1,5 @@
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use chrono::Local;
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
@@ -62,6 +63,8 @@ impl App {
         self.hourly_temp = hour_temp.1;
         self.hourly_time = hour_temp.0;
 
+
+
     }
 
     fn exit(&mut self) {
@@ -80,7 +83,7 @@ impl Widget for &App {
         let dashboard_title = Line::from("Dashboard").bold();
         let footer_title = Line::from("Footer").bold();
 
-        let footer_body = Line::from("Developed by Spoofydude").bold();
+        let footer_body = Line::from("spoofy ent").bold();
 
         let instructions = Line::from(vec![
             " Quit ".into(),
@@ -103,15 +106,22 @@ impl Widget for &App {
         let main_layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
-                Constraint::Min(2),
-                Constraint::Min(2),
+                Constraint::Min(2), // Left Side
+                Constraint::Min(2), // Right Side
             ])
             .split(outer_layout[1]);
-        //
+
+        let weather_layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Min(2), // Hourly
+                Constraint::Max(20), // OPM Status
+            ])
+            .split(main_layout[1]);
         //
         // OPM Status Information
         let opm_body = Text::from(vec![
-            Line::from(self.opm[0].to_string().bold()),
+            Line::from(self.opm[0].to_string().bold()).italic().green(),
             Line::from(self.opm[1].to_string().bold()),
             Line::from(self.opm[2].to_string().bold()),
             Line::from(self.opm[3].to_string().bold()),
@@ -120,20 +130,28 @@ impl Widget for &App {
         let hour_body = Text::from(vec![
             Line::from(self.hourly_time[0].to_string().bold()),
             Line::from(self.hourly_time[1].to_string().bold()),
-            Line::from(self.hourly_time[2].to_string().bold()),
             Line::from(format!("{:?}", self.hourly_time).to_string().bold()),
         ]);
 
         // Layout Information
         //
         // Body
+        let hourlyweather = Paragraph::new(hour_body)
+            .wrap(Wrap {trim: true})
+            .left_aligned()
+            .block(
+                Block::bordered()
+                .title(hour_title.left_aligned())
+                .border_set(border::THICK)
+            )
+            .render(main_layout[0], buf);
 
         let opmblock = Paragraph::new(opm_body)
             .wrap(Wrap {trim: true})
             .left_aligned()
             .block(
                 Block::bordered()
-                .title(opm_title.centered())
+                .title(opm_title.left_aligned().yellow())
                 .border_set(border::THICK)
             )
             .render(main_layout[1], buf);
@@ -148,21 +166,12 @@ impl Widget for &App {
        //     )
        //     .render(main_layout[0], buf);
        // 
-        let hourlyweather = Paragraph::new(hour_body)
-            .wrap(Wrap {trim: true})
-            .left_aligned()
-            .block(
-                Block::bordered()
-                .title(hour_title.centered())
-                .border_set(border::THICK)
-            )
-            .render(main_layout[0], buf);
 
         // Header, Footer
         
-        let header = Paragraph::new("Header Text")
+        let header = Paragraph::new(chrono::Local::now().time().to_string())
             .wrap(Wrap {trim: true})
-            .left_aligned()
+            .centered()
             .block(
                 Block::bordered()
                 .title(header_title.centered())
