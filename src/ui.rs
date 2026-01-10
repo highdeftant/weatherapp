@@ -14,8 +14,9 @@ use std::io;
 
 #[derive(Debug, Default)]
 pub struct App {
+    next_hours: i32,
     hourly_time: Vec<String>, 
-    hourly_temp: Vec<String>,
+    hourly_temp: Vec<f64>,
     current_time: Vec<String>,
     opm: Vec<String>,
     exit: bool,
@@ -59,11 +60,10 @@ impl App {
         self.current_time = time
     }
 
-    pub fn upd_hours(&mut self, hour_temp: (Vec<String>, Vec<String>)) {
-        self.hourly_temp = hour_temp.1;
+    pub fn upd_hours(&mut self, hour_temp: (Vec<String>, Vec<f64>, i32)) { 
         self.hourly_time = hour_temp.0;
-
-
+        self.hourly_temp = hour_temp.1;
+        self.next_hours = hour_temp.2;
 
     }
 
@@ -106,18 +106,18 @@ impl Widget for &App {
         let main_layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
-                Constraint::Min(2), // Left Side
+                Constraint::Min(1), // Left Side
                 Constraint::Min(2), // Right Side
             ])
             .split(outer_layout[1]);
 
         let weather_layout = Layout::default()
-            .direction(Direction::Horizontal)
+            .direction(Direction::Vertical)
             .constraints([
-                Constraint::Min(2), // Hourly
-                Constraint::Max(20), // OPM Status
+                Constraint::Ratio(1,4), // Hourly
+                Constraint::Min(2), // OPM Status
             ])
-            .split(main_layout[1]);
+            .split(main_layout[0]);
         //
         // OPM Status Information
         let opm_body = Text::from(vec![
@@ -127,15 +127,24 @@ impl Widget for &App {
             Line::from(self.opm[3].to_string().bold()),
         ]);
 
-        let hour_body = Text::from(vec![
-            Line::from(self.hourly_time[0].to_string().bold()),
-            Line::from(self.hourly_time[1].to_string().bold()),
-            Line::from(format!("{:?}", self.hourly_time).to_string().bold()),
-        ]);
+        let hour_body: Vec<Line> = self.hourly_time
+            .iter()
+            .map(|time| Line::from(time.as_str()))
+            .collect();
 
         // Layout Information
         //
         // Body
+        let currentweather = Paragraph::new("Milk")
+            .wrap(Wrap {trim: true})
+            .left_aligned()
+            .block(
+                Block::bordered()
+                .title(current_title.left_aligned())
+                .border_set(border::THICK)
+            )
+            .render(weather_layout[0], buf);
+
         let hourlyweather = Paragraph::new(hour_body)
             .wrap(Wrap {trim: true})
             .left_aligned()
@@ -156,25 +165,15 @@ impl Widget for &App {
             )
             .render(main_layout[1], buf);
 
-       // let currentweather = Paragraph::new("Current")
-       //     .wrap(Wrap {trim: true})
-       //     .left_aligned()
-       //     .block(
-       //         Block::bordered()
-       //         .title(current_title.left_aligned())
-       //         .border_set(border::THICK)
-       //     )
-       //     .render(main_layout[0], buf);
-       // 
+        
 
         // Header, Footer
         
-        let header = Paragraph::new(chrono::Local::now().time().to_string())
+        let header = Paragraph::new(chrono::Local::now().date_naive().to_string())
             .wrap(Wrap {trim: true})
             .centered()
             .block(
                 Block::bordered()
-                .title(header_title.centered())
                 .border_set(border::THICK)
             )
             .render(outer_layout[0], buf);

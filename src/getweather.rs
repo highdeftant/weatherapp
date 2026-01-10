@@ -16,13 +16,13 @@ pub fn get_current(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) -> V
     current_time
 }
 
-pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> (Vec<String>, Vec<String>) {
+pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> (Vec<String>, Vec<f64>, i32) {
     let datestring = "%Y-%m-%dT%H:%M";
     let local = chrono::Local::now();
     let mut num = 0;
     let mut next = 0;
-    let mut new_hours:Vec<String> = Vec::new();
-    let mut new_temp: Vec<String> = Vec::new();
+    let mut new_hours: Vec<String> = Vec::new();
+    let mut new_temp: Vec<f64> = Vec::new();
     
     for hour in hourly {
         num += 1;
@@ -40,12 +40,11 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> (Vec<String>, Vec<St
         if naivelocal.date_naive() == local.date_naive() {
             if naivelocal.time() >= local.time() {
                 next += 1;
-                new_temp.push(format!("{}°", temp[num]));
-                new_hours.push(format!("{}", naivelocal.time()).to_string());
+                new_hours.push(format!("{}° at {}", temp[num], naivelocal.time()).to_string());
             }
         }
     }
-    (new_hours, new_temp)
+    (new_hours, new_temp, next)
 }
 
 pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) -> Vec<String> {
