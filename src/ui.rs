@@ -79,6 +79,7 @@ impl Widget for &App {
         let opm_title = Line::from("OPM Status").bold();
         let hour_title = Line::from("Hourly").bold();
         let current_title = Line::from("Current").bold();
+        let news_title = Line::from("News").bold();
         let header_title = Line::from("Header").bold();
         let dashboard_title = Line::from("Dashboard").bold();
         let footer_title = Line::from("Footer").bold();
@@ -106,16 +107,16 @@ impl Widget for &App {
         let main_layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
-                Constraint::Min(1), // Left Side
-                Constraint::Min(2), // Right Side
+                Constraint::Ratio(1, 2), // Left Side
+                Constraint::Ratio(1, 2), // Right Side
             ])
             .split(outer_layout[1]);
 
         let weather_layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Ratio(1,4), // Hourly
-                Constraint::Min(2), // OPM Status
+                Constraint::Ratio(1, 2), // Top
+                Constraint::Ratio(1, 2), // Bottom
             ])
             .split(main_layout[0]);
         //
@@ -135,7 +136,7 @@ impl Widget for &App {
         // Layout Information
         //
         // Body
-        let currentweather = Paragraph::new("Milk")
+        let currentweather = Paragraph::new("Current")
             .wrap(Wrap {trim: true})
             .left_aligned()
             .block(
@@ -146,6 +147,7 @@ impl Widget for &App {
             .render(weather_layout[0], buf);
 
         let hourlyweather = Paragraph::new(hour_body)
+            .scroll((1,0))
             .wrap(Wrap {trim: true})
             .left_aligned()
             .block(
@@ -153,7 +155,7 @@ impl Widget for &App {
                 .title(hour_title.left_aligned())
                 .border_set(border::THICK)
             )
-            .render(main_layout[0], buf);
+            .render(weather_layout[1], buf);
 
         let opmblock = Paragraph::new(opm_body)
             .wrap(Wrap {trim: true})
@@ -171,6 +173,7 @@ impl Widget for &App {
         
         let header = Paragraph::new(chrono::Local::now().date_naive().to_string())
             .wrap(Wrap {trim: true})
+            .scroll((0,3))
             .centered()
             .block(
                 Block::bordered()
