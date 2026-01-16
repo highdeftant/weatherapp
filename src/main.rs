@@ -43,11 +43,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let extendedinfo = opm_status.ExtendedInformation;
     let opm = showopm(&location, &shortmessage, &extendedinfo, &stat);
     let hours = get_hourly(&htime, &htemp);
-    //currentweather(&ctime, &ctemp, &local);
+    let current = get_current(&ctime, &ctemp);
 
     color_eyre::install()?;
     let mut terminal = ratatui::init();
     let mut app = App::default();
+    app.upd_current(current);
     app.upd_opm(opm);
     app.upd_hours(hours);
     let result = app.run(&mut terminal);

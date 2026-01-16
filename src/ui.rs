@@ -7,7 +7,7 @@ use ratatui::{
     style::Stylize,
     symbols::border,
     text::{Line, Text},
-    widgets::{Block, Paragraph, Widget, Wrap},
+    widgets::{Block, Paragraph, Widget, Wrap, LineGauge},
     DefaultTerminal, Frame,
 };
 use std::io;
@@ -77,6 +77,7 @@ impl Widget for &App {
 
     fn render(self, area: Rect, buf: &mut Buffer) {
         let opm_title = Line::from("OPM Status").bold();
+        let next_hours = Line::from(format!("Next {} hours", self.next_hours));
         let hour_title = Line::from("Hourly").bold();
         let current_title = Line::from("Current").bold();
         let news_title = Line::from("News").bold();
@@ -133,10 +134,16 @@ impl Widget for &App {
             .map(|time| Line::from(time.as_str()))
             .collect();
 
+        let current_body = Line::from(vec![
+            self.current_time[0].to_string().bold().into(),
+            " at ".to_string().bold().into(),
+            self.current_time[1].to_string().bold().into(),]);
+
+
         // Layout Information
         //
         // Body
-        let currentweather = Paragraph::new("Current")
+        let currentweather = Paragraph::new(current_body)
             .wrap(Wrap {trim: true})
             .left_aligned()
             .block(
@@ -147,7 +154,6 @@ impl Widget for &App {
             .render(weather_layout[0], buf);
 
         let hourlyweather = Paragraph::new(hour_body)
-            .scroll((1,0))
             .wrap(Wrap {trim: true})
             .left_aligned()
             .block(
@@ -168,12 +174,10 @@ impl Widget for &App {
             .render(main_layout[1], buf);
 
         
-
         // Header, Footer
         
         let header = Paragraph::new(chrono::Local::now().date_naive().to_string())
             .wrap(Wrap {trim: true})
-            .scroll((0,3))
             .centered()
             .block(
                 Block::bordered()

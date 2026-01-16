@@ -1,18 +1,22 @@
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
 
-pub fn get_current(_datetime: &str, _ctemp: &f64, _local: &DateTime<Local>) -> Vec<String> {
-    let _datestring = "%Y-%m-%dT%H:%M";
-    let _naive_dt = NaiveDateTime::parse_from_str(&_datetime, _datestring)
+pub fn get_current(datetime: &str, ctemp: &f64) -> Vec<String> {
+
+    let datestring = "%Y-%m-%dT%H:%M";
+    let naive_dt = NaiveDateTime::parse_from_str(&datetime, datestring)
         .expect("[ERR]: Could Not Parse DateTime -> :");
 
-    let _local_dt = Local
-        .from_local_datetime(&_naive_dt)
+    let local_dt = Local
+        .from_local_datetime(&naive_dt)
         .single()
         .expect("[ERR]: Invalid time input. -> :");
 
-    let now_time = Local::now();
 
-    let current_time = vec![format!("{}", now_time)];
+    let current_time = vec![
+        format!("{}°", ctemp),
+        format!("{}", local_dt.time()),
+        
+    ];
     current_time
 }
 
