@@ -2,6 +2,7 @@ mod getweather;
 mod ui;
 mod weather;
 
+use tokio::time::{Interval, Duration};
 use crate::{
     getweather::{get_current, get_hourly, showopm},
     ui::App,
@@ -41,6 +42,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let location = opm_status.Location;
     let shortmessage = opm_status.ShortStatusMessage;
     let extendedinfo = opm_status.ExtendedInformation;
+
+
+
+    let timer = Duration::new(30,0);
     let opm = showopm(&location, &shortmessage, &extendedinfo, &stat);
     let hours = get_hourly(&htime, &htemp);
     let current = get_current(&ctime, &ctemp);

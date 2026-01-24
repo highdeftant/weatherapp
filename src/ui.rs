@@ -78,7 +78,11 @@ impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let opm_title = Line::from("OPM Status").bold();
         let next_hours = Line::from(format!("Next {} hours", self.next_hours));
-        let hour_title = Line::from("Hourly").bold();
+        let hour_title = Line::from(vec![
+            "Next ".bold().into(),
+            self.next_hours.to_string().bold().into(),
+            " Hour(s)".bold().into(),]);
+
         let current_title = Line::from("Current").bold();
         let news_title = Line::from("News").bold();
         let header_title = Line::from("Header").bold();
