@@ -1,5 +1,5 @@
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use chrono::Local;
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
@@ -7,7 +7,7 @@ use ratatui::{
     style::Stylize,
     symbols::border,
     text::{Line, Text},
-    widgets::{Block, Paragraph, Widget, Wrap, LineGauge},
+    widgets::{Block, LineGauge, Paragraph, Widget, Wrap},
     DefaultTerminal, Frame,
 };
 use std::io;
@@ -15,7 +15,7 @@ use std::io;
 #[derive(Debug, Default)]
 pub struct App {
     next_hours: i32,
-    hourly_time: Vec<String>, 
+    hourly_time: Vec<String>,
     hourly_temp: Vec<f64>,
     current_time: Vec<String>,
     opm: Vec<String>,
@@ -60,11 +60,10 @@ impl App {
         self.current_time = time
     }
 
-    pub fn upd_hours(&mut self, hour_temp: (Vec<String>, Vec<f64>, i32)) { 
+    pub fn upd_hours(&mut self, hour_temp: (Vec<String>, Vec<f64>, i32)) {
         self.hourly_time = hour_temp.0;
         self.hourly_temp = hour_temp.1;
         self.next_hours = hour_temp.2;
-
     }
 
     fn exit(&mut self) {
@@ -74,14 +73,14 @@ impl App {
 
 // ANCHOR: Widget for App
 impl Widget for &App {
-
     fn render(self, area: Rect, buf: &mut Buffer) {
         let opm_title = Line::from("OPM Status").bold();
         let next_hours = Line::from(format!("Next {} hours", self.next_hours));
         let hour_title = Line::from(vec![
             "Next ".bold().into(),
             self.next_hours.to_string().bold().into(),
-            " Hour(s)".bold().into(),]);
+            " Hour(s)".bold().into(),
+        ]);
 
         let current_title = Line::from("Current").bold();
         let news_title = Line::from("News").bold();
@@ -103,7 +102,7 @@ impl Widget for &App {
             .direction(Direction::Vertical)
             .constraints([
                 Constraint::Length(3), // Header
-                Constraint::Min(10), // Main Container
+                Constraint::Min(10),   // Main Container
                 Constraint::Length(3), // Footer
             ])
             .split(area);
@@ -133,7 +132,8 @@ impl Widget for &App {
             Line::from(self.opm[3].to_string().bold()),
         ]);
 
-        let hour_body: Vec<Line> = self.hourly_time
+        let hour_body: Vec<Line> = self
+            .hourly_time
             .iter()
             .map(|time| Line::from(time.as_str()))
             .collect();
@@ -141,62 +141,58 @@ impl Widget for &App {
         let current_body = Line::from(vec![
             self.current_time[0].to_string().bold().into(),
             " at ".to_string().bold().into(),
-            self.current_time[1].to_string().bold().into(),]);
-
+            self.current_time[1].to_string().bold().into(),
+        ]);
 
         // Layout Information
         //
         // Body
         let currentweather = Paragraph::new(current_body)
-            .wrap(Wrap {trim: true})
+            .wrap(Wrap { trim: true })
             .left_aligned()
             .block(
                 Block::bordered()
-                .title(current_title.left_aligned())
-                .border_set(border::THICK)
+                    .title(current_title.left_aligned())
+                    .border_set(border::THICK),
             )
             .render(weather_layout[0], buf);
 
         let hourlyweather = Paragraph::new(hour_body)
-            .wrap(Wrap {trim: true})
+            .wrap(Wrap { trim: true })
             .left_aligned()
             .block(
                 Block::bordered()
-                .title(hour_title.left_aligned())
-                .border_set(border::THICK)
+                    .title(hour_title.left_aligned())
+                    .border_set(border::THICK),
             )
             .render(weather_layout[1], buf);
 
         let opmblock = Paragraph::new(opm_body)
-            .wrap(Wrap {trim: true})
+            .wrap(Wrap { trim: true })
             .left_aligned()
             .block(
                 Block::bordered()
-                .title(opm_title.left_aligned().yellow())
-                .border_set(border::THICK)
+                    .title(opm_title.left_aligned().yellow())
+                    .border_set(border::THICK),
             )
             .render(main_layout[1], buf);
 
-        
         // Header, Footer
-        
+
         let header = Paragraph::new(chrono::Local::now().date_naive().to_string())
-            .wrap(Wrap {trim: true})
+            .wrap(Wrap { trim: true })
             .centered()
-            .block(
-                Block::bordered()
-                .border_set(border::THICK)
-            )
+            .block(Block::bordered().border_set(border::THICK))
             .render(outer_layout[0], buf);
-        
+
         let footer = Paragraph::new(footer_body)
-            .wrap(Wrap {trim: true})
+            .wrap(Wrap { trim: true })
             .left_aligned()
             .block(
                 Block::bordered()
-                .title(footer_title.centered())
-                .title_bottom(instructions.centered())
-                .border_set(border::THICK)
+                    .title(footer_title.centered())
+                    .title_bottom(instructions.centered())
+                    .border_set(border::THICK),
             )
             .render(outer_layout[2], buf);
     }

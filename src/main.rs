@@ -1,8 +1,10 @@
 mod getweather;
 mod ui;
 mod weather;
+mod weatherapi;
 
-use tokio::time::{Interval, Duration};
+use weatherapi::{get_weather};
+use tokio;
 use crate::{
     getweather::{get_current, get_hourly, showopm},
     ui::App,
@@ -17,47 +19,51 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let weatherendpoint = String::from("https://api.open-meteo.com/v1/forecast?latitude=38.8951&longitude=-77.0364&hourly=temperature_2m&current=temperature_2m,rain&timezone=America%2FNew_York&temperature_unit=fahrenheit");
     let opmendpoint = String::from("https://www.opm.gov/json/operatingstatus.json");
 
-    let weatherinfo: WeatherResponse = reqwest::Client::new()
-        .get(weatherendpoint)
-        .send()
-        .await?
-        .json()
-        .await?;
-
-    let opm_status: OpmStatus = reqwest::Client::new()
-        .get(opmendpoint)
-        .send()
-        .await?
-        .json()
-        .await?;
-
-    // Weather info
-    let htime = weatherinfo.hourly.time;
-    let htemp = weatherinfo.hourly.temperature_2m;
-    let ctime = weatherinfo.current.time;
-    let ctemp = weatherinfo.current.temperature_2m;
-
-    // OPM Status
-    let stat = opm_status.StatusType;
-    let location = opm_status.Location;
-    let shortmessage = opm_status.ShortStatusMessage;
-    let extendedinfo = opm_status.ExtendedInformation;
+    let response = tokio::spawn(async move {
+        let weather = get_weather(&weatherendpoint).await
+    });
 
 
 
-    let timer = Duration::new(30,0);
-    let opm = showopm(&location, &shortmessage, &extendedinfo, &stat);
-    let hours = get_hourly(&htime, &htemp);
-    let current = get_current(&ctime, &ctemp);
-
-    color_eyre::install()?;
-    let mut terminal = ratatui::init();
-    let mut app = App::default();
-    app.upd_current(current);
-    app.upd_opm(opm);
-    app.upd_hours(hours);
-    let result = app.run(&mut terminal);
-    ratatui::restore();
-    result?;
+//
+//    let weatherinfo: WeatherResponse = reqwest::Client::new()
+//        .get(weatherendpoint)
+//        .send()
+//        .await?
+//        .json()
+//        .await?;
+//
+//    let opm_status: OpmStatus = reqwest::Client::new()
+//        .get(opmendpoint)
+//        .send()
+//        .await?
+//        .json()
+//        .await?;
+//
+//    // Weather info
+//    let htime = weatherinfo.hourly.time;
+//    let htemp = weatherinfo.hourly.temperature_2m;
+//    let ctime = weatherinfo.current.time;
+//    let ctemp = weatherinfo.current.temperature_2m;
+//
+//    // OPM Status
+//    let stat = opm_status.StatusType;
+//    let location = opm_status.Location;
+//    let shortmessage = opm_status.ShortStatusMessage;
+//    let extendedinfo = opm_status.ExtendedInformation;
+//
+//    let opm = showopm(&location, &shortmessage, &extendedinfo, &stat);
+//    let hours = get_hourly(&htime, &htemp);
+//    let current = get_current(&ctime, &ctemp);
+//
+//    color_eyre::install()?;
+//    let mut terminal = ratatui::init();
+//    let mut app = App::default();
+//    app.upd_current(current);
+//    app.upd_opm(opm);
+//    app.upd_hours(hours);
+//    let result = app.run(&mut terminal);
+//    ratatui::restore();
+//    result?;
     Ok(())
 }
