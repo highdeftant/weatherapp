@@ -30,3 +30,9 @@ pub struct OpmStatus {
    pub ExtendedInformation: String,
    pub StatusType: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DataPoll {
+    url: String,
+    interval: u64,
+}

@@ -1,31 +1,42 @@
+mod weather
 use reqwest;
 use serde::{Deserialize, Serialize};
 use tokio::time::{interval, Duration};
+use weather::{DataPoll};
+
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct WeatherResponse {
-    pub latitude: f64,
-    pub longitude: f64,
-    pub current: CurrentWeather,
-    pub hourly: HourlyWeather,
+struct WeatherResponse {
+     latitude: f64,
+     longitude: f64,
+     current: CurrentWeather,
+     hourly: HourlyWeather,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct CurrentWeather {
-    pub time: String,
-    pub interval: i64,
-    pub temperature_2m: f64,
-    pub rain: f64,
+struct CurrentWeather {
+     time: String,
+     temperature_2m: f64,
+     rain: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HourlyWeather {
-    pub time: Vec<String>,
-    pub temperature_2m: Vec<f64>,
+struct HourlyWeather {
+     time: Vec<String>,
+     temperature_2m: Vec<f64>,
 }
 
-pub async fn get_weather(endpoint: &str, interval: u64) -> Result<(), reqwest::Error> {
-    let mut timer = interval(Duration::from_secs(3));
+#[derive(Serialize, Deserialize, Debug)]
+struct WeatherWidget {
+    current_weather: String,
+    current_time: String,
+    hourly_tempurature: Vec<f64>,
+    hourly_time: Vec<String>,
+}
+
+pub async fn get_weather(endpoint: &str, int: u64) -> Result<(), reqwest::Error> {
+    
+    let mut timer = interval(Duration::from_secs(int));
     let client = reqwest::Client::new();
 
     loop {
@@ -38,7 +49,6 @@ pub async fn get_weather(endpoint: &str, interval: u64) -> Result<(), reqwest::E
             .json::<WeatherResponse>()
             .await?;
 
-        let ctime = weather.current.temperature_2m;
         println!("{ctime}")
 
     }

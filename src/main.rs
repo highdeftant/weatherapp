@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opmendpoint = String::from("https://www.opm.gov/json/operatingstatus.json");
 
     let response = tokio::spawn(async move {
-        let weather = get_weather(&weatherendpoint).await
+        let weather = get_weather(&weatherendpoint, 30).await;
     });
 
 
@@ -55,15 +55,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //    let opm = showopm(&location, &shortmessage, &extendedinfo, &stat);
 //    let hours = get_hourly(&htime, &htemp);
 //    let current = get_current(&ctime, &ctemp);
-//
-//    color_eyre::install()?;
-//    let mut terminal = ratatui::init();
-//    let mut app = App::default();
-//    app.upd_current(current);
-//    app.upd_opm(opm);
-//    app.upd_hours(hours);
-//    let result = app.run(&mut terminal);
-//    ratatui::restore();
-//    result?;
+
+    color_eyre::install()?;
+    let mut terminal = ratatui::init();
+    let mut app = App::default();
+
+    loop {
+
+        app.upd_current(current);
+        app.upd_opm(opm);
+        app.upd_hours(hours);
+        let result = app.run(&mut terminal);
+        ratatui::restore();
+        result?;
+
+    }
+
     Ok(())
 }
