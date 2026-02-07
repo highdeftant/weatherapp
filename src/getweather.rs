@@ -1,5 +1,10 @@
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
 
+
+fn naive_to_local(time: String) {
+
+
+}
 pub fn get_current(datetime: &str, ctemp: &f64) -> Vec<String> {
 
     let datestring = "%Y-%m-%dT%H:%M";

@@ -23,8 +23,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let weather = get_weather(&weatherendpoint, 30).await;
     });
 
-
-
 //
 //    let weatherinfo: WeatherResponse = reqwest::Client::new()
 //        .get(weatherendpoint)

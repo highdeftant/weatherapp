@@ -1,4 +1,4 @@
-mod weather
+mod weather; 
 use reqwest;
 use serde::{Deserialize, Serialize};
 use tokio::time::{interval, Duration};
