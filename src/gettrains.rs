@@ -1,9 +1,9 @@
 use reqwest; 
-
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Trains {
     Trains: TrainInfo
 }
-
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TrainInfo {
     Car: String,
     Destination: String,
@@ -22,7 +22,7 @@ pub async fn get_trains() -> Result<(), reqwest::error::Error> {
     traininfo: Trains = reqwest::Client::new()
         .get(endpoint)
         .await?
-        .json()
+        .json::<TrainInfo>()
         .await?;
 
 

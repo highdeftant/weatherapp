@@ -14,12 +14,18 @@ use std::io;
 
 #[derive(Debug, Default)]
 pub struct App {
+    appinfo: AppInfo,
+    last_updated: String,
+    exit: bool,
+}
+
+#[derive(Debug, Default)]
+pub mut struct AppInfo {
     next_hours: i32,
     hourly_time: Vec<String>,
     hourly_temp: Vec<f64>,
     current_time: Vec<String>,
     opm: Vec<String>,
-    exit: bool,
 }
 
 impl App {
