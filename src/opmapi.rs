@@ -13,6 +13,7 @@ pub struct OpmStatus {
    pub ShortStatusMessage: String,
    pub ExtendedInformation: String,
    pub StatusType: String,
+}
 
 pub async fn get_opm(endpoint: &str, int: u64) -> Result<(), reqwest::Error> {
     let mut timer = interval(Duration::from_secs(int));
@@ -31,11 +32,13 @@ pub async fn get_opm(endpoint: &str, int: u64) -> Result<(), reqwest::Error> {
         // set variables to send to logic functions
          let location = opm.Location;
          let status = opm.StatusType;
-         let shortmsg = opm.ShortStatusMessage;
+         let shortmessage = opm.ShortStatusMessage;
          let extendedinfo = opm.ExtendedInformation;
+
+         let opm = showopm(location, shortmessage, extendedinfo, status);
          
     }
-
+    
     Ok(())
 }
 

@@ -20,7 +20,7 @@ pub struct App {
 }
 
 #[derive(Debug, Default)]
-pub mut struct AppInfo {
+pub struct AppInfo {
     next_hours: i32,
     hourly_time: Vec<String>,
     hourly_temp: Vec<f64>,
@@ -59,17 +59,17 @@ impl App {
     }
 
     pub fn upd_opm(&mut self, opmstatus: Vec<String>) {
-        self.opm = opmstatus;
+        self.appinfo.opm = opmstatus;
     }
 
     pub fn upd_current(&mut self, time: Vec<String>) {
-        self.current_time = time
+        self.appinfo.current_time = time
     }
 
     pub fn upd_hours(&mut self, hour_temp: (Vec<String>, Vec<f64>, i32)) {
-        self.hourly_time = hour_temp.0;
-        self.hourly_temp = hour_temp.1;
-        self.next_hours = hour_temp.2;
+        self.appinfo.hourly_time = hour_temp.0;
+        self.appinfo.hourly_temp = hour_temp.1;
+        self.appinfo.next_hours = hour_temp.2;
     }
 
     fn exit(&mut self) {
@@ -79,12 +79,17 @@ impl App {
 
 // ANCHOR: Widget for App
 impl Widget for &App {
+
+    fn create_title(title: String) -> Line {
+        let new_title = Line::from(title).bold();
+        new_title
+    }
     fn render(self, area: Rect, buf: &mut Buffer) {
         let opm_title = Line::from("OPM Status").bold();
-        let next_hours = Line::from(format!("Next {} hours", self.next_hours));
+        let next_hours = Line::from(format!("Next {} hours", self.appinfo.next_hours));
         let hour_title = Line::from(vec![
             "Next ".bold().into(),
-            self.next_hours.to_string().bold().into(),
+            self.appinfo.next_hours.to_string().bold().into(),
             " Hour(s)".bold().into(),
         ]);
 
@@ -132,22 +137,22 @@ impl Widget for &App {
         //
         // OPM Status Information
         let opm_body = Text::from(vec![
-            Line::from(self.opm[0].to_string().bold()).italic().green(),
-            Line::from(self.opm[1].to_string().bold()),
-            Line::from(self.opm[2].to_string().bold()),
-            Line::from(self.opm[3].to_string().bold()),
+            Line::from(self.appinfo.opm[0].to_string().bold()).italic().green(),
+            Line::from(self.appinfo.opm[1].to_string().bold()),
+            Line::from(self.appinfo.opm[2].to_string().bold()),
+            Line::from(self.appinfo.opm[3].to_string().bold()),
         ]);
 
         let hour_body: Vec<Line> = self
-            .hourly_time
+            .appinfo.hourly_time
             .iter()
             .map(|time| Line::from(time.as_str()))
             .collect();
 
         let current_body = Line::from(vec![
-            self.current_time[0].to_string().bold().into(),
+            self.appinfo.current_time[0].to_string().bold().into(),
             " at ".to_string().bold().into(),
-            self.current_time[1].to_string().bold().into(),
+            self.appinfo.current_time[1].to_string().bold().into(),
         ]);
 
         // Layout Information
@@ -184,7 +189,6 @@ impl Widget for &App {
             .render(main_layout[1], buf);
 
         // Header, Footer
-
         let header = Paragraph::new(chrono::Local::now().date_naive().to_string())
             .wrap(Wrap { trim: true })
             .centered()

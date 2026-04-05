@@ -1,10 +1,17 @@
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
 
+fn naive_to_local(time) {
+    
+    let datestring = "%Y-%m-%dT%H:%M";
+    let naive_dt = NaiveDateTime::parse_from_str(&time, datestring)
+        .expect("[ERR]: Could Not Parse DateTime -> :");
 
-fn naive_to_local(time: String) {
-
-
+    let local_dt = Local
+        .from_local_datetime(&naive_dt)
+        .single()
+        .expect("[ERR]: Invalid time input. -> :");
 }
+
 pub fn get_current(datetime: &str, ctemp: &f64) -> Vec<String> {
 
     let datestring = "%Y-%m-%dT%H:%M";
@@ -54,14 +61,4 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> (Vec<String>, Vec<f6
         }
     }
     (new_hours, new_temp, next)
-}
-
-pub fn showopm(location: &str, shortmessage: &str, extendedinfo: &str, status: &str) -> Vec<String> {
-    let opm: Vec<String> = vec![
-        format!("Status: {status}").to_string(),
-        format!("Location: {location}").to_string(),
-        format!("Information: {shortmessage}").to_string(),
-        format!("Extended: {extendedinfo}").to_string(),
-    ];
-    opm
 }

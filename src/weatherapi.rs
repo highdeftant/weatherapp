@@ -1,10 +1,10 @@
-mod weather;
-mod ui;
-
 use reqwest;
 use serde::{Deserialize, Serialize};
 use tokio::time::{interval, Duration};
-use weather::DataPoll;
+use crate::{
+    weather::DataPoll,
+    weatherconv::get_hourly, showopm, get_current
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct WeatherResponse {
@@ -49,14 +49,14 @@ pub async fn get_weather(endpoint: &str, int: u64) -> Result<(), reqwest::Error>
             .json::<WeatherResponse>()
             .await?;
 
-
         // set variables to send to logic functions
         let htime = weather.hourly.time;
         let htemp = weather.hourly.temperature_2m;
         let ctime = weather.current.time;
         let ctemp = weather.current.temperature_2m;
-    }
+        
 
+    }
 
     Ok(())
 }
