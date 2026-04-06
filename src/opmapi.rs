@@ -1,7 +1,6 @@
-mod getweather;
 use crate::{
-    getweather::{showopm};
-}
+    opmapi::{showopm},
+};
 use reqwest;
 use serde::{Deserialize, Serialize};
 use tokio::time::{interval, Duration};

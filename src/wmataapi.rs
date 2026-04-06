@@ -1,6 +1,3 @@
-mod ui;
-mod weather;
-
 use reqwest;
 use serde::{Deserialize, Serialize};
 use tokio::time::{interval, Duration};
@@ -37,7 +34,6 @@ pub async fn get_trains() -> Result<(), reqwest::error::Error> {
             .json::<Trains>()
             .await?;
         }
-    
     
     Ok(())
 }
