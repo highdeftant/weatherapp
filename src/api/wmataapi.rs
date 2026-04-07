@@ -20,9 +20,9 @@ pub struct TrainInfo {
     Min: String,
 }
 
-pub async fn get_trains() -> Result<(), reqwest::error::Error> {
+pub async fn get_trains(int: u64) -> Result<(), reqwest::Error> {
     let mut endpoint = "http://api.wmata.com/StationPrediction.svc/json/GetPrediction/{}";
-    let mut timer = interval(uration::from_secs(int));
+    let mut timer = interval(Duration::from_secs(int));
 
     loop {
 

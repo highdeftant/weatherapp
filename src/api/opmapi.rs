@@ -31,7 +31,7 @@ pub async fn get_opm(endpoint: &str, int: u64) -> Result<(), reqwest::Error> {
          let shortmessage = opm.ShortStatusMessage;
          let extendedinfo = opm.ExtendedInformation;
 
-         let opm = showopm(location, shortmessage, extendedinfo, status);
+         let opm = showopm(&location, &shortmessage, &extendedinfo, &status);
          
     }
     
