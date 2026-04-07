@@ -1,7 +1,7 @@
 use reqwest;
 use serde::{Deserialize, Serialize};
 use tokio::time::{interval, Duration};
-use weather::DataPoll;
+use crate::weather::DataPoll;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Trains {

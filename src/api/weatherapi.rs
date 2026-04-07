@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 use tokio::time::{interval, Duration};
 use crate::{
     weather::DataPoll,
-    weatherconv::get_hourly, showopm, get_current
+    weatherconv::{get_current, get_hourly},
+    api::opmapi::showopm,
 };
 
 #[derive(Serialize, Deserialize, Debug)]

@@ -1,20 +1,18 @@
 mod weatherconv;
 mod ui;
 mod weather;
-mod weatherapi;
-mod opmapi;
-mod wmataapi;
+mod api;
 
 use crate::{
-    weatherconv::{get_current, get_hourly, showopm},
+    weatherconv::{get_current, get_hourly},
     ui::App,
 };
 use color_eyre;
 use ratatui;
 use reqwest;
 use tokio;
-use weather::{CurrentWeather, HourlyWeather, OpmStatus, WeatherResponse};
-use weatherapi::get_weather;
+use crate::weather::{CurrentWeather, HourlyWeather, OpmStatus, WeatherResponse};
+use crate::api::weatherapi::get_weather;
 
 pub struct Wmata {
     DestinationName: String,
