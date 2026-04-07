@@ -1,4 +1,7 @@
+mod app_widget;
+
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use ratatui::{DefaultTerminal, Frame};
 use std::io;
 
 #[derive(Debug, Default)]
