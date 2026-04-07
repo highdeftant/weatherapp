@@ -32,22 +32,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     });
 
-    //    // Weather info
-    //    let htime = weatherinfo.hourly.time;
-    //    let htemp = weatherinfo.hourly.temperature_2m;
-    //    let ctime = weatherinfo.current.time;
-    //    let ctemp = weatherinfo.current.temperature_2m;
-    //
-    //    // OPM Status
-    //    let stat = opm_status.StatusType;
-    //    let location = opm_status.Location;
-    //    let shortmessage = opm_status.ShortStatusMessage;
-    //    let extendedinfo = opm_status.ExtendedInformation;
-    //
-    //    let opm = showopm(&location, &shortmessage, &extendedinfo, &stat);
-    //    let hours = get_hourly(&htime, &htemp);
-    //    let current = get_current(&ctime, &ctemp);
-
     color_eyre::install()?;
     let mut terminal = ratatui::init();
     let mut app = App::default();
