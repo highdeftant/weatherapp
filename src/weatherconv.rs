@@ -1,6 +1,6 @@
 use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
 
-fn naive_to_local(time: NaiveDateTime) {
+fn naive_to_local(time: &str) {
     
     let datestring = "%Y-%m-%dT%H:%M";
     let naive_dt = NaiveDateTime::parse_from_str(&time, datestring)

@@ -30,6 +30,7 @@ pub async fn get_trains(int: u64) -> Result<(), reqwest::Error> {
 
         let traininfo = reqwest::Client::new()
             .get(endpoint)
+            .send()
             .await?
             .json::<Trains>()
             .await?;
