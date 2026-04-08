@@ -48,11 +48,28 @@ impl Widget for &App {
             .constraints([Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)])
             .split(main_layout[0]);
 
+        let opm0 = match self.appinfo.opm.get(0) {
+            Some(s) => s.as_str(),
+            None => "Status: loading",
+        };
+        let opm1 = match self.appinfo.opm.get(1) {
+            Some(s) => s.as_str(),
+            None => "Location: --",
+        };
+        let opm2 = match self.appinfo.opm.get(2) {
+            Some(s) => s.as_str(),
+            None => "Information: loading",
+        };
+        let opm3 = match self.appinfo.opm.get(3) {
+            Some(s) => s.as_str(),
+            None => "Extended: loading",
+        };
+
         let opm_body = Text::from(vec![
-            Line::from(self.appinfo.opm[0].to_string().bold()).italic().green(),
-            Line::from(self.appinfo.opm[1].to_string().bold()),
-            Line::from(self.appinfo.opm[2].to_string().bold()),
-            Line::from(self.appinfo.opm[3].to_string().bold()),
+            Line::from(opm0.to_string().bold()).italic().green(),
+            Line::from(opm1.to_string().bold()),
+            Line::from(opm2.to_string().bold()),
+            Line::from(opm3.to_string().bold()),
         ]);
 
         let hour_body: Vec<Line> = self
@@ -61,10 +78,19 @@ impl Widget for &App {
             .map(|time| Line::from(time.as_str()))
             .collect();
 
+        let current_temp = match self.appinfo.current_time.get(0) {
+            Some(s) => s.as_str(),
+            None => "--°",
+        };
+        let current_clock = match self.appinfo.current_time.get(1) {
+            Some(s) => s.as_str(),
+            None => "--:--:--",
+        };
+
         let current_body = Line::from(vec![
-            self.appinfo.current_time[0].to_string().bold().into(),
+            current_temp.to_string().bold().into(),
             " at ".to_string().bold().into(),
-            self.appinfo.current_time[1].to_string().bold().into(),
+            current_clock.to_string().bold().into(),
         ]);
 
         Paragraph::new(current_body)

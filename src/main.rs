@@ -4,44 +4,60 @@ mod weather;
 mod api;
 
 use crate::{
-    weatherconv::{get_current, get_hourly},
     ui::App,
+    weather::WeatherResponse,
+    weatherconv::{get_current, get_hourly},
 };
 use color_eyre;
 use ratatui;
-use reqwest;
-use tokio;
-use crate::weather::{CurrentWeather, HourlyWeather, OpmStatus, WeatherResponse};
-use crate::api::weatherapi::get_weather;
-
-pub struct Wmata {
-    DestinationName: String,
-    Line: String,
-    Min: String,
-}
+use tokio::time::{interval, Duration};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let weatherendpoint = String::from("https://api.open-meteo.com/v1/forecast?latitude=38.8951&longitude=-77.0364&hourly=temperature_2m&current=temperature_2m,rain&timezone=America%2FNew_York&temperature_unit=fahrenheit");
-    let opmendpoint = String::from("https://www.opm.gov/json/operatingstatus.json");
-
-    let response = tokio::spawn(async move {
-        get_weather(&weatherendpoint, 30).await;
-
-    });
+    let weatherendpoint = "https://api.open-meteo.com/v1/forecast?latitude=38.8951&longitude=-77.0364&hourly=temperature_2m&current=temperature_2m,rain&timezone=America%2FNew_York&temperature_unit=fahrenheit";
 
     color_eyre::install()?;
     let mut terminal = ratatui::init();
     let mut app = App::default();
 
-    loop {
-   //     app.upd_current(current);
-   //     app.upd_opm(opm);
-   //     app.upd_hours(hours);
-        let result = app.run(&mut terminal);
-        ratatui::restore();
-        result?;
-        break Ok(())
-    }
+    app.upd_opm(vec![
+        "Status: loading".to_string(),
+        "Location: --".to_string(),
+        "Information: weather only".to_string(),
+        "Extended: press q to quit".to_string(),
+    ]);
 
+    let client = reqwest::Client::new();
+    let mut refresh = interval(Duration::from_secs(30));
+
+    loop {
+        tokio::select! {
+            _ = refresh.tick() => {
+                match client
+                    .get(weatherendpoint)
+                    .send()
+                    .await?
+                    .json::<WeatherResponse>()
+                    .await
+                {
+                    Ok(weather) => {
+                        let current = get_current(&weather.current.time, &weather.current.temperature_2m);
+                        let hourly = get_hourly(&weather.hourly.time, &weather.hourly.temperature_2m);
+                        app.upd_current(current);
+                        app.upd_hours(hourly);
+                    }
+                    Err(_) => {
+                        // keep last good UI state on fetch/parse errors
+                    }
+                }
+            }
+            _ = tokio::time::sleep(Duration::from_millis(75)) => {
+                app.tick(&mut terminal)?;
+                if app.should_exit() {
+                    ratatui::restore();
+                    break Ok(());
+                }
+            }
+        }
+    }
 }

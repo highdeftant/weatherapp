@@ -2,7 +2,7 @@ mod app_widget;
 
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
-use std::io;
+use std::{io, time::Duration};
 
 #[derive(Debug, Default)]
 pub struct App {
@@ -29,6 +29,16 @@ impl App {
         Ok(())
     }
 
+    pub fn tick(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+        terminal.draw(|frame| self.draw(frame))?;
+        self.handle_events_nonblocking()?;
+        Ok(())
+    }
+
+    pub fn should_exit(&self) -> bool {
+        self.exit
+    }
+
     fn draw(&self, frame: &mut Frame) {
         frame.render_widget(self, frame.area());
     }
@@ -40,6 +50,17 @@ impl App {
             }
             _ => {}
         };
+        Ok(())
+    }
+
+    fn handle_events_nonblocking(&mut self) -> io::Result<()> {
+        if event::poll(Duration::from_millis(0))? {
+            if let Event::Key(key_event) = event::read()? {
+                if key_event.kind == KeyEventKind::Press {
+                    self.handle_key_event(key_event);
+                }
+            }
+        }
         Ok(())
     }
 
