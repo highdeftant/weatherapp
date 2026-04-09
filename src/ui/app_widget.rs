@@ -48,32 +48,24 @@ impl Widget for &App {
             .constraints([Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)])
             .split(main_layout[0]);
 
-        let opm0 = match self.appinfo.opm.get(0) {
-            Some(s) => s.as_str(),
-            None => "Status: loading",
-        };
-        let opm1 = match self.appinfo.opm.get(1) {
-            Some(s) => s.as_str(),
-            None => "Location: --",
-        };
-        let opm2 = match self.appinfo.opm.get(2) {
-            Some(s) => s.as_str(),
-            None => "Information: loading",
-        };
-        let opm3 = match self.appinfo.opm.get(3) {
-            Some(s) => s.as_str(),
-            None => "Extended: loading",
-        };
-
-        let opm_body = Text::from(vec![
-            Line::from(opm0.to_string().bold()).italic().green(),
-            Line::from(opm1.to_string().bold()),
-            Line::from(opm2.to_string().bold()),
-            Line::from(opm3.to_string().bold()),
-        ]);
+        let opm_body: Vec<Line> = self
+            .appinfo
+            .opm
+            .iter()
+            .enumerate()
+            .map(|(i, s)| {
+                let line = Line::from(s.as_str().bold());
+                if i == 0 {
+                    line.italic().green()
+                } else {
+                    line
+                }
+            })
+            .collect();
 
         let hour_body: Vec<Line> = self
-            .appinfo.hourly_time
+            .appinfo
+            .hourly_time
             .iter()
             .map(|time| Line::from(time.as_str()))
             .collect();
