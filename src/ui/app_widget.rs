@@ -5,8 +5,8 @@ use ratatui::{
     prelude::*,
     style::Stylize,
     symbols::border,
-    text::{Line, Text},
-    widgets::{Block, Paragraph, Widget, Wrap},
+    text::Line,
+    widgets::{Axis, Block, Chart, Dataset, GraphType, Paragraph, Widget, Wrap},
 };
 
 impl Widget for &App {
@@ -17,6 +17,7 @@ impl Widget for &App {
             self.appinfo.next_hours.to_string().bold().into(),
             " Hour(s)".bold().into(),
         ]);
+        let chart_title = Line::from("Hourly Temp Chart").bold();
 
         let current_title = Line::from("Current").bold();
         let footer_title = Line::from("Footer").bold();
@@ -45,7 +46,11 @@ impl Widget for &App {
 
         let weather_layout = Layout::default()
             .direction(Direction::Vertical)
-            .constraints([Constraint::Ratio(1, 2), Constraint::Ratio(1, 2)])
+            .constraints([
+                Constraint::Ratio(1, 3),
+                Constraint::Ratio(1, 3),
+                Constraint::Ratio(1, 3),
+            ])
             .split(main_layout[0]);
 
         let opm_body: Vec<Line> = self
@@ -55,11 +60,7 @@ impl Widget for &App {
             .enumerate()
             .map(|(i, s)| {
                 let line = Line::from(s.as_str().bold());
-                if i == 0 {
-                    line.italic().green()
-                } else {
-                    line
-                }
+                if i == 0 { line.italic().green() } else { line }
             })
             .collect();
 
@@ -70,7 +71,7 @@ impl Widget for &App {
             .map(|time| Line::from(time.as_str()))
             .collect();
 
-        let current_temp = match self.appinfo.current_time.get(0) {
+        let current_temp = match self.appinfo.current_time.first() {
             Some(s) => s.as_str(),
             None => "--°",
         };
@@ -104,6 +105,63 @@ impl Widget for &App {
                     .border_set(border::THICK),
             )
             .render(weather_layout[1], buf);
+
+        let hourly_points: Vec<(f64, f64)> = self
+            .appinfo
+            .hourly_temp
+            .iter()
+            .take(24)
+            .enumerate()
+            .map(|(i, value)| (i as f64, *value))
+            .collect();
+
+        if hourly_points.is_empty() {
+            Paragraph::new("no hourly chart data")
+                .left_aligned()
+                .block(
+                    Block::bordered()
+                        .title(chart_title.left_aligned())
+                        .border_set(border::THICK),
+                )
+                .render(weather_layout[2], buf);
+        } else {
+            let mut y_min = f64::INFINITY;
+            let mut y_max = f64::NEG_INFINITY;
+            for (_, value) in &hourly_points {
+                y_min = y_min.min(*value);
+                y_max = y_max.max(*value);
+            }
+
+            if (y_max - y_min).abs() < f64::EPSILON {
+                y_min -= 1.0;
+                y_max += 1.0;
+            } else {
+                y_min -= 2.0;
+                y_max += 2.0;
+            }
+
+            let x_max = if hourly_points.len() > 1 {
+                (hourly_points.len() - 1) as f64
+            } else {
+                1.0
+            };
+
+            let dataset = Dataset::default()
+                .name("temp")
+                .graph_type(GraphType::Line)
+                .data(&hourly_points)
+                .style(Style::default().cyan());
+
+            Chart::new(vec![dataset])
+                .x_axis(Axis::default().bounds([0.0, x_max]).title("hours"))
+                .y_axis(Axis::default().bounds([y_min, y_max]).title("°F"))
+                .block(
+                    Block::bordered()
+                        .title(chart_title.left_aligned())
+                        .border_set(border::THICK),
+                )
+                .render(weather_layout[2], buf);
+        }
 
         Paragraph::new(opm_body)
             .wrap(Wrap { trim: true })
