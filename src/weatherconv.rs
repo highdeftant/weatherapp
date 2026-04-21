@@ -50,11 +50,17 @@ pub fn timestamp_to_hour_label(ts: &str) -> String {
         .unwrap_or_else(|| "?".to_string())
 }
 
-/// Data ready for the chart: hour labels, temps, count.
-pub struct ChartData {
-    pub hour_labels: Vec<String>,
-    pub temps: Vec<f64>,
-    pub count: i32,
+/// Extract hour-of-day label from a formatted hourly string like "72.5° at 14:00:00".
+/// Pulls the hour component from the time portion and returns e.g. "2PM".
+pub fn label_from_hourly_string(s: &str) -> String {
+    // Format: "72.5° at 14:00:00" or "75.0° at 9:45:00"
+    let Some(pos) = s.rfind(" at ") else {
+        return "?".to_string();
+    };
+    let time_str = &s[pos + 4..]; // "14:00:00" or "9:45:00"
+    let colon_pos = time_str.find(':').unwrap_or(time_str.len());
+    let hour = time_str[..colon_pos].parse::<u32>().unwrap_or(0);
+    hour_to_label(hour)
 }
 
 pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> (Vec<String>, Vec<f64>, i32) {
@@ -87,48 +93,11 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> (Vec<String>, Vec<f6
     (new_hours, new_temp, next)
 }
 
-/// Produce chart-ready data from the same inputs used by get_hourly.
-/// Returns raw timestamps (not formatted) so the chart can build hour labels.
-pub fn get_chart_data(hourly: &Vec<String>, temp: &Vec<f64>) -> ChartData {
-    let datestring = "%Y-%m-%dT%H:%M";
-    let local = chrono::Local::now();
-    let mut hour_labels: Vec<String> = Vec::new();
-    let mut temps: Vec<f64> = Vec::new();
-
-    for (index, hour) in hourly.iter().enumerate() {
-        let Some(temp_value) = temp.get(index) else {
-            continue;
-        };
-
-        let Ok(naivedate) = NaiveDateTime::parse_from_str(hour, datestring) else {
-            continue;
-        };
-
-        let Some(naivelocal) = Local.from_local_datetime(&naivedate).single() else {
-            continue;
-        };
-
-        if naivelocal.date_naive() == local.date_naive() && naivelocal.time() >= local.time() {
-            if let Some(h) = hour_from_timestamp(hour) {
-                hour_labels.push(hour_to_label(h));
-            } else {
-                hour_labels.push("?".to_string());
-            }
-            temps.push(*temp_value);
-        }
-    }
-
-    let count = hour_labels.len() as i32;
-    ChartData {
-        hour_labels,
-        temps,
-        count,
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{get_chart_data, get_hourly, hour_from_timestamp, timestamp_to_hour_label};
+    use super::{
+        get_hourly, hour_from_timestamp, label_from_hourly_string, timestamp_to_hour_label,
+    };
     use chrono::{Duration, Local};
 
     #[test]
@@ -182,22 +151,16 @@ mod tests {
     }
 
     #[test]
-    fn get_chart_data_produces_hour_labels_and_temps() {
-        let now = Local::now();
-        let next1 = (now + Duration::hours(1))
-            .format("%Y-%m-%dT%H:%M")
-            .to_string();
-        let next2 = (now + Duration::hours(2))
-            .format("%Y-%m-%dT%H:%M")
-            .to_string();
+    fn label_from_hourly_string_parses_formatted() {
+        assert_eq!(label_from_hourly_string("72.5° at 14:00:00"), "2PM");
+        assert_eq!(label_from_hourly_string("68.0° at 0:00:00"), "12AM");
+        assert_eq!(label_from_hourly_string("80.0° at 12:30:00"), "12PM");
+        assert_eq!(label_from_hourly_string("75.0° at 9:45:00"), "9AM");
+    }
 
-        let hourly = vec![next1, next2];
-        let temp = vec![70.0, 75.0];
-
-        let chart = get_chart_data(&hourly, &temp);
-
-        assert_eq!(chart.count, 2);
-        assert_eq!(chart.temps, vec![70.0, 75.0]);
-        assert_eq!(chart.hour_labels.len(), 2);
+    #[test]
+    fn label_from_hourly_string_invalid_returns_question() {
+        assert_eq!(label_from_hourly_string("no time here"), "?");
+        assert_eq!(label_from_hourly_string(""), "?");
     }
 }

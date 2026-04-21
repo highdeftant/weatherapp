@@ -1,4 +1,5 @@
 use super::App;
+use crate::weatherconv::label_from_hourly_string;
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
@@ -159,18 +160,14 @@ impl Widget for &App {
                     .collect()
             };
 
-            // --- X axis tick labels: hour-of-day labels from API timestamps ---
-            let hour_labels = &self.appinfo.chart_hour_labels;
-            let x_ticks: Vec<(f64, String)> = hourly_points
+            // --- X axis tick labels: extract hour-of-day from hourly_time strings ---
+            // hourly_time contains formatted strings like "72.5° at 14:00:00"
+            let x_labels: Vec<String> = self
+                .appinfo
+                .hourly_time
                 .iter()
-                .enumerate()
-                .map(|(i, _)| {
-                    let label = hour_labels
-                        .get(i)
-                        .cloned()
-                        .unwrap_or_else(|| "?".to_string());
-                    (i as f64, label)
-                })
+                .take(hourly_points.len())
+                .map(|s| label_from_hourly_string(s))
                 .collect();
 
             let dataset = Dataset::default()
@@ -184,7 +181,7 @@ impl Widget for &App {
                     Axis::default()
                         .bounds([0.0, x_max])
                         .title("Hour")
-                        .labels(x_ticks.iter().map(|(_, l)| l.clone()).collect::<Vec<_>>())
+                        .labels(x_labels)
                         .style(Style::default().dark_gray()),
                 )
                 .y_axis(
