@@ -26,7 +26,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "Set WMATA_API_KEY to enable live arrivals".to_string(),
     ]);
 
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(10))
+        .build()?;
     let mut refresh = interval(Duration::from_secs(30));
 
     loop {
@@ -35,23 +37,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match client
                     .get(weatherendpoint)
                     .send()
-                    .await?
-                    .json::<WeatherResponse>()
                     .await
                 {
-                    Ok(weather) => {
-                        let current = get_current(&weather.current.time, &weather.current.temperature_2m);
-                        let hourly = get_hourly(&weather.hourly.time, &weather.hourly.temperature_2m);
-                        app.upd_current(current);
-                        app.upd_hours(hourly);
-
-                        let wmata_lines = status_lines_from_env(&client, 6).await;
-                        app.upd_opm(wmata_lines);
-                    }
+                    Ok(resp) => match resp.json::<WeatherResponse>().await {
+                        Ok(weather) => {
+                            let current = get_current(&weather.current.time, &weather.current.temperature_2m);
+                            let hourly = get_hourly(&weather.hourly.time, &weather.hourly.temperature_2m);
+                            app.upd_current(current);
+                            app.upd_hours(hourly);
+                        }
+                        Err(_) => {
+                            // keep last good UI state on parse errors
+                        }
+                    },
                     Err(_) => {
-                        // keep last good UI state on fetch/parse errors
+                        // keep last good UI state on network errors
                     }
                 }
+
+                // fetch WMATA lines separately — don't block weather on WMATA failure
+                let wmata_lines = status_lines_from_env(&client, 6).await;
+                app.upd_opm(wmata_lines);
             }
             _ = tokio::time::sleep(Duration::from_millis(75)) => {
                 app.tick(&mut terminal)?;
