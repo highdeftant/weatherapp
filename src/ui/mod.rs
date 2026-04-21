@@ -16,6 +16,7 @@ pub struct AppInfo {
     next_hours: i32,
     hourly_time: Vec<String>,
     hourly_temp: Vec<f64>,
+    chart_hour_labels: Vec<String>,
     current_time: Vec<String>,
     opm: Vec<String>,
 }
@@ -83,6 +84,10 @@ impl App {
         self.appinfo.hourly_time = hour_temp.0;
         self.appinfo.hourly_temp = hour_temp.1;
         self.appinfo.next_hours = hour_temp.2;
+    }
+
+    pub fn upd_chart_hours(&mut self, labels: Vec<String>) {
+        self.appinfo.chart_hour_labels = labels;
     }
 
     fn exit(&mut self) {

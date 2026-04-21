@@ -11,7 +11,7 @@ use ratatui::{
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let opm_title = Line::from("OPM Status").bold();
+        let opm_title = Line::from("WMATA Arrivals").bold();
         let hour_title = Line::from(vec![
             "Next ".bold().into(),
             self.appinfo.next_hours.to_string().bold().into(),
@@ -125,6 +125,7 @@ impl Widget for &App {
                 )
                 .render(weather_layout[2], buf);
         } else {
+            // --- Y axis bounds (temperature) ---
             let mut y_min = f64::INFINITY;
             let mut y_max = f64::NEG_INFINITY;
             for (_, value) in &hourly_points {
@@ -140,11 +141,37 @@ impl Widget for &App {
                 y_max += 2.0;
             }
 
+            // --- X axis bounds ---
             let x_max = if hourly_points.len() > 1 {
                 (hourly_points.len() - 1) as f64
             } else {
                 1.0
             };
+
+            // --- Y axis tick labels: floor/mean/ceil temperatures ---
+            let y_ticks: Vec<(f64, String)> = {
+                let step = (y_max - y_min) / 4.0;
+                (0..=4)
+                    .map(|i| {
+                        let val = y_min + step * i as f64;
+                        (val, format!("{:.0}°", val))
+                    })
+                    .collect()
+            };
+
+            // --- X axis tick labels: hour-of-day labels from API timestamps ---
+            let hour_labels = &self.appinfo.chart_hour_labels;
+            let x_ticks: Vec<(f64, String)> = hourly_points
+                .iter()
+                .enumerate()
+                .map(|(i, _)| {
+                    let label = hour_labels
+                        .get(i)
+                        .cloned()
+                        .unwrap_or_else(|| "?".to_string());
+                    (i as f64, label)
+                })
+                .collect();
 
             let dataset = Dataset::default()
                 .name("temp")
@@ -153,8 +180,20 @@ impl Widget for &App {
                 .style(Style::default().cyan());
 
             Chart::new(vec![dataset])
-                .x_axis(Axis::default().bounds([0.0, x_max]).title("hours"))
-                .y_axis(Axis::default().bounds([y_min, y_max]).title("°F"))
+                .x_axis(
+                    Axis::default()
+                        .bounds([0.0, x_max])
+                        .title("Hour")
+                        .labels(x_ticks.iter().map(|(_, l)| l.clone()).collect::<Vec<_>>())
+                        .style(Style::default().dark_gray()),
+                )
+                .y_axis(
+                    Axis::default()
+                        .bounds([y_min, y_max])
+                        .title("Temp °F")
+                        .labels(y_ticks.iter().map(|(_, l)| l.clone()).collect::<Vec<_>>())
+                        .style(Style::default().dark_gray()),
+                )
                 .block(
                     Block::bordered()
                         .title(chart_title.left_aligned())
