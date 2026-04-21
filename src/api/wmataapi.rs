@@ -1,22 +1,19 @@
-use reqwest;
-use serde::{Deserialize, Serialize};
-use tokio::time::{Duration, interval};
+use serde::Deserialize;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Trains {
-    Trains: Vec<TrainInfo>,
+#[derive(Deserialize, Debug)]
+struct Trains {
+    #[serde(rename = "Trains")]
+    trains: Vec<TrainInfo>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct TrainInfo {
-    Car: String,
-    Destination: String,
-    DestinationCode: String,
-    DestinationName: String,
-    LocationCode: String,
-    LocationName: String,
-    Line: String,
-    Min: String,
+#[derive(Deserialize, Debug)]
+struct TrainInfo {
+    #[serde(rename = "DestinationName")]
+    destination_name: String,
+    #[serde(rename = "Line")]
+    line: String,
+    #[serde(rename = "Min")]
+    min: String,
 }
 
 /// Fetch train prediction lines from WMATA API, returning up to `max` formatted lines.
@@ -39,10 +36,10 @@ pub async fn status_lines_from_env(client: &reqwest::Client, max: usize) -> Vec<
     {
         Ok(resp) => match resp.json::<Trains>().await {
             Ok(trains) => trains
-                .Trains
+                .trains
                 .into_iter()
                 .take(max)
-                .map(|t| format!("{} to {} — {} min", t.Line, t.DestinationName, t.Min))
+                .map(|t| format!("{} to {} — {} min", t.line, t.destination_name, t.min))
                 .collect(),
             Err(_) => vec!["Error parsing WMATA response".to_string()],
         },

@@ -1,17 +1,5 @@
 use chrono::{Local, NaiveDateTime, TimeZone};
 
-fn naive_to_local(time: &str) {
-    let datestring = "%Y-%m-%dT%H:%M";
-    let naive_dt = NaiveDateTime::parse_from_str(time, datestring)
-        .expect("[ERR]: Could Not Parse DateTime -> :");
-
-    let local_dt = Local
-        .from_local_datetime(&naive_dt)
-        .single()
-        .expect("[ERR]: Invalid time input. -> :");
-    let _ = local_dt;
-}
-
 pub fn get_current(datetime: &str, ctemp: &f64) -> Vec<String> {
     let datestring = "%Y-%m-%dT%H:%M";
     let naive_dt = NaiveDateTime::parse_from_str(datetime, datestring)
@@ -25,39 +13,18 @@ pub fn get_current(datetime: &str, ctemp: &f64) -> Vec<String> {
     vec![format!("{}°", ctemp), format!("{}", local_dt.time())]
 }
 
-/// Convert a 0-23 hour integer into a 12-hour label like "12AM", "3PM".
 fn hour_to_label(hour: u32) -> String {
     let h12 = if hour % 12 == 0 { 12 } else { hour % 12 };
     let ampm = if hour < 12 { "AM" } else { "PM" };
     format!("{}{}", h12, ampm)
 }
 
-/// Extract the hour (0-23) from a "%Y-%m-%dT%H:%M" timestamp string
-/// using simple string slicing. Avoids chrono time-component methods.
-fn hour_from_timestamp(ts: &str) -> Option<u32> {
-    // Expected: "2024-01-01T14:00"
-    //                      ^^^
-    let t_pos = ts.find('T')?;
-    let hour_str = ts.get(t_pos + 1..t_pos + 3)?;
-    hour_str.parse::<u32>().ok()
-}
-
-/// Parse a timestamp string in "%Y-%m-%dT%H:%M" format into a human-readable
-/// hour label like "12PM" or "3AM".
-pub fn timestamp_to_hour_label(ts: &str) -> String {
-    hour_from_timestamp(ts)
-        .map(hour_to_label)
-        .unwrap_or_else(|| "?".to_string())
-}
-
 /// Extract hour-of-day label from a formatted hourly string like "72.5° at 14:00:00".
-/// Pulls the hour component from the time portion and returns e.g. "2PM".
 pub fn label_from_hourly_string(s: &str) -> String {
-    // Format: "72.5° at 14:00:00" or "75.0° at 9:45:00"
     let Some(pos) = s.rfind(" at ") else {
         return "?".to_string();
     };
-    let time_str = &s[pos + 4..]; // "14:00:00" or "9:45:00"
+    let time_str = &s[pos + 4..];
     let colon_pos = time_str.find(':').unwrap_or(time_str.len());
     let hour = time_str[..colon_pos].parse::<u32>().unwrap_or(0);
     hour_to_label(hour)
@@ -95,9 +62,7 @@ pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> (Vec<String>, Vec<f6
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        get_hourly, hour_from_timestamp, label_from_hourly_string, timestamp_to_hour_label,
-    };
+    use super::{get_hourly, label_from_hourly_string};
     use chrono::{Duration, Local};
 
     #[test]
@@ -117,37 +82,6 @@ mod tests {
 
         assert_eq!(count, 1);
         assert_eq!(temps, vec![72.5]);
-    }
-
-    #[test]
-    fn hour_from_timestamp_parses_valid() {
-        assert_eq!(hour_from_timestamp("2024-01-01T00:00"), Some(0));
-        assert_eq!(hour_from_timestamp("2024-01-01T06:00"), Some(6));
-        assert_eq!(hour_from_timestamp("2024-01-01T12:00"), Some(12));
-        assert_eq!(hour_from_timestamp("2024-01-01T15:00"), Some(15));
-        assert_eq!(hour_from_timestamp("2024-01-01T23:00"), Some(23));
-    }
-
-    #[test]
-    fn hour_from_timestamp_returns_none_on_invalid() {
-        assert_eq!(hour_from_timestamp("not-a-date"), None);
-        assert_eq!(hour_from_timestamp(""), None);
-        assert_eq!(hour_from_timestamp("2024-01-01"), None);
-    }
-
-    #[test]
-    fn timestamp_to_hour_label_24h_formats() {
-        assert_eq!(timestamp_to_hour_label("2024-01-01T00:00"), "12AM");
-        assert_eq!(timestamp_to_hour_label("2024-01-01T06:00"), "6AM");
-        assert_eq!(timestamp_to_hour_label("2024-01-01T12:00"), "12PM");
-        assert_eq!(timestamp_to_hour_label("2024-01-01T15:00"), "3PM");
-        assert_eq!(timestamp_to_hour_label("2024-01-01T23:00"), "11PM");
-    }
-
-    #[test]
-    fn timestamp_to_hour_label_invalid_returns_question() {
-        assert_eq!(timestamp_to_hour_label("not-a-date"), "?");
-        assert_eq!(timestamp_to_hour_label(""), "?");
     }
 
     #[test]

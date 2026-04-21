@@ -18,21 +18,6 @@ pub struct CurrentWeather {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HourlyWeather {
-   pub time: Vec<String>,
-   pub temperature_2m: Vec<f64>,
-}
-
-// OPM Status
-#[derive(Serialize, Deserialize, Debug)]
-pub struct OpmStatus {
-   pub Location: String,
-   pub ShortStatusMessage: String,
-   pub ExtendedInformation: String,
-   pub StatusType: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DataPoll {
-    url: String,
-    interval: u64,
+    pub time: Vec<String>,
+    pub temperature_2m: Vec<f64>,
 }

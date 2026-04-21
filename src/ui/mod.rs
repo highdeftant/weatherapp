@@ -7,7 +7,6 @@ use std::{io, time::Duration};
 #[derive(Debug, Default)]
 pub struct App {
     appinfo: AppInfo,
-    last_updated: String,
     exit: bool,
 }
 
