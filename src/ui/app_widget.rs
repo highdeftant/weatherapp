@@ -23,14 +23,13 @@ impl Widget for &App {
         let chart_title = Line::from("Hourly Temp Chart").bold();
 
         let current_title = Line::from("Current").bold();
-        let footer_title = Line::from("Footer").bold();
-        let footer_body = Line::from("spoofy ent").bold();
+        let footer_title = Line::from("Controls").bold();
+        let footer_body = Line::from("WMATA + weather dashboard").bold();
 
         let instructions = Line::from(vec![
             Span::raw("Quit "),
             Span::raw("<Q>").blue().bold(),
-            Span::raw("  Refresh "),
-            Span::raw("<R>").blue(),
+            Span::raw("  Auto-refresh every 30s"),
         ]);
 
         let outer_layout = Layout::default()
@@ -65,12 +64,17 @@ impl Widget for &App {
                 }
 
                 let styled = Line::from(line.as_str().bold());
+                let normalized = line.to_ascii_lowercase();
                 match line.as_str() {
                     l if l.starts_with("Station:") => styled.yellow().italic(),
-                    l if l.contains("Set WMATA_API_KEY") || l.contains("no arrivals") => {
+                    _ if normalized.contains("set wmata_api_key")
+                        || normalized.contains("no arrivals") =>
+                    {
                         styled.red().dim()
                     }
-                    l if l.contains("Error") || l.contains("failed") => styled.red(),
+                    _ if normalized.contains("error") || normalized.contains("failed") => {
+                        styled.red()
+                    }
                     _ => styled,
                 }
             })

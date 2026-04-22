@@ -20,14 +20,6 @@ pub struct AppInfo {
 }
 
 impl App {
-    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
-        while !self.exit {
-            terminal.draw(|frame| self.draw(frame))?;
-            self.handle_events()?;
-        }
-        Ok(())
-    }
-
     pub fn tick(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         terminal.draw(|frame| self.draw(frame))?;
         self.handle_events_nonblocking()?;
@@ -42,22 +34,13 @@ impl App {
         frame.render_widget(self, frame.area());
     }
 
-    fn handle_events(&mut self) -> io::Result<()> {
-        match event::read()? {
-            Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
-                self.handle_key_event(key_event)
-            }
-            _ => {}
-        };
-        Ok(())
-    }
-
     fn handle_events_nonblocking(&mut self) -> io::Result<()> {
         if event::poll(Duration::from_millis(0))? {
-            if let Event::Key(key_event) = event::read()? {
-                if key_event.kind == KeyEventKind::Press {
+            match event::read()? {
+                Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
                     self.handle_key_event(key_event);
                 }
+                _ => {}
             }
         }
         Ok(())
@@ -69,8 +52,8 @@ impl App {
         }
     }
 
-    pub fn upd_wmata_arrivals(&mut self, wmatastatus: Vec<String>) {
-        self.appinfo.wmata_arrivals = wmatastatus;
+    pub fn upd_wmata_arrivals(&mut self, wmata_arrivals: Vec<String>) {
+        self.appinfo.wmata_arrivals = wmata_arrivals;
     }
 
     pub fn upd_current(&mut self, time: Vec<String>) {

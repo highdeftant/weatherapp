@@ -2,8 +2,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WeatherResponse {
-    pub latitude: f64,
-    pub longitude: f64,
     pub current: CurrentWeather,
     pub hourly: HourlyWeather,
 }
@@ -11,9 +9,7 @@ pub struct WeatherResponse {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CurrentWeather {
     pub time: String,
-    pub interval: i64,
     pub temperature_2m: f64,
-    pub rain: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

@@ -26,15 +26,6 @@ pub struct WmataConfig {
 }
 
 impl WmataConfig {
-    /// Returns the first (primary) station code, for backwards compatibility.
-    #[allow(dead_code)]
-    pub fn primary_station_code(&self) -> &str {
-        self.station_codes
-            .first()
-            .map(String::as_str)
-            .unwrap_or(DEFAULT_STATION_CODE)
-    }
-
     /// Returns all station codes.
     pub fn station_codes(&self) -> &[String] {
         &self.station_codes
@@ -297,17 +288,6 @@ pub async fn fetch_all_stations(client: &reqwest::Client, config: &WmataConfig) 
     }
 
     all_lines
-}
-
-/// Backwards-compatible wrapper that fetches only the primary station.
-#[allow(dead_code)]
-#[deprecated(
-    since = "0.2.0",
-    note = "Use fetch_all_stations() for multi-station support"
-)]
-pub async fn status_lines_from_env(client: &reqwest::Client, max: usize) -> Vec<String> {
-    let config = load_config_from_env(max);
-    fetch_all_stations(client, &config).await
 }
 
 #[cfg(test)]

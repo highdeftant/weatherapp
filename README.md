@@ -7,7 +7,7 @@ A high-density weather dashboard built with Rust and Ratatui, featuring multi-st
 - **Status**: Active Development
 - **Started**: Learning Rust project
 - **Purpose**: High-density weather dashboard with local WMATA train times
-- **Features**: OPM status, hourly data, future crypto/portfolio tracking
+- **Features**: WMATA arrivals, hourly weather data, future crypto/portfolio tracking
 
 ## Tech Stack
 
@@ -23,12 +23,11 @@ A high-density weather dashboard built with Rust and Ratatui, featuring multi-st
 src/
 ├── main.rs          # Single async event loop
 ├── api/             # API integrations
-│   ├── weatherapi.rs # Weather data
-│   ├── wmatapi.rs   # WMATA train times
-│   └── opmapi.rs    # OPM status
+│   └── wmataapi.rs  # WMATA train times
 ├── ui/              # UI components
 │   └── app_widget.rs # Main dashboard widget
-└── weatherconv.rs   # Weather conversions
+├── weather.rs       # Weather API response types
+└── weatherconv.rs   # Weather formatting/conversions
 ```
 
 ## Configuration
@@ -83,11 +82,11 @@ Rosslyn    BL  8
 
 ## WIP
 
-- [ ] Add hourly data chart
+- [x] Add hourly data chart
 - [ ] Add crypto portfolio PnL tracking
 - [ ] Add high/low system
-- [ ] Auto-updates every x seconds
-- [ ] Replace OPM status in off-season
+- [x] Auto-refresh every 30 seconds
+- [x] Multi-station WMATA arrivals
 
 ## Setup
 
