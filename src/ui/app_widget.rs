@@ -56,24 +56,21 @@ impl Widget for &App {
             ])
             .split(main_layout[0]);
 
-        // Render multi-station WMATA data with proper grouping
         let wmata_lines = &self.appinfo.wmata_arrivals;
         let wmata_body: Vec<Line> = wmata_lines
             .iter()
             .map(|line| {
+                if line.is_empty() {
+                    return Line::from("");
+                }
+
                 let styled = Line::from(line.as_str().bold());
                 match line.as_str() {
-                    // Title line
-                    "WMATA Arrivals" => styled.yellow().bold(),
-                    // Station header lines
                     l if l.starts_with("Station:") => styled.yellow().italic(),
-                    // Help/info lines
                     l if l.contains("Set WMATA_API_KEY") || l.contains("no arrivals") => {
                         styled.red().dim()
                     }
-                    // Error lines
                     l if l.contains("Error") || l.contains("failed") => styled.red(),
-                    // Regular arrival lines
                     _ => styled,
                 }
             })

@@ -247,16 +247,13 @@ pub fn format_station_lines(
 /// Returns formatted lines grouped by station, with each station section prefixed by its name.
 pub async fn fetch_all_stations(client: &reqwest::Client, config: &WmataConfig) -> Vec<String> {
     let Ok(api_key) = std::env::var("WMATA_API_KEY") else {
-        return vec![
-            "WMATA Arrivals".to_string(),
-            "Set WMATA_API_KEY to enable live arrivals".to_string(),
-        ];
+        return vec!["Set WMATA_API_KEY to enable live arrivals".to_string()];
     };
 
+    let station_codes = config.station_codes();
     let mut all_lines = Vec::new();
-    all_lines.push("WMATA Arrivals".to_string());
 
-    for station_code in config.station_codes() {
+    for (index, station_code) in station_codes.iter().enumerate() {
         let endpoint = format!(
             "https://api.wmata.com/StationPrediction.svc/json/GetPrediction/{}",
             station_code
@@ -270,7 +267,6 @@ pub async fn fetch_all_stations(client: &reqwest::Client, config: &WmataConfig) 
         {
             Ok(resp) => match resp.json::<Trains>().await {
                 Ok(trains) => {
-                    // Get station name from first train if available
                     let station_name = trains
                         .trains
                         .first()
@@ -294,6 +290,10 @@ pub async fn fetch_all_stations(client: &reqwest::Client, config: &WmataConfig) 
         };
 
         all_lines.extend(station_lines);
+
+        if index + 1 < station_codes.len() {
+            all_lines.push(String::new());
+        }
     }
 
     all_lines

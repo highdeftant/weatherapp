@@ -19,10 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal = ratatui::init();
     let mut app = App::default();
 
-    app.upd_wmata_arrivals(vec![
-        "WMATA Arrivals".to_string(),
-        "Set WMATA_API_KEY to enable live arrivals".to_string(),
-    ]);
+    app.upd_wmata_arrivals(vec!["Set WMATA_API_KEY to enable live arrivals".to_string()]);
 
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(10))
