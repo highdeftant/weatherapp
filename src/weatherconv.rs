@@ -14,7 +14,11 @@ pub fn get_current(datetime: &str, ctemp: &f64) -> Vec<String> {
 }
 
 fn hour_to_label(hour: u32) -> String {
-    let h12 = if hour % 12 == 0 { 12 } else { hour % 12 };
+    let h12 = if hour.is_multiple_of(12) {
+        12
+    } else {
+        hour % 12
+    };
     let ampm = if hour < 12 { "AM" } else { "PM" };
     format!("{}{}", h12, ampm)
 }
@@ -30,7 +34,7 @@ pub fn label_from_hourly_string(s: &str) -> String {
     hour_to_label(hour)
 }
 
-pub fn get_hourly(hourly: &Vec<String>, temp: &Vec<f64>) -> (Vec<String>, Vec<f64>, i32) {
+pub fn get_hourly(hourly: &[String], temp: &[f64]) -> (Vec<String>, Vec<f64>, i32) {
     let datestring = "%Y-%m-%dT%H:%M";
     let local = chrono::Local::now();
     let mut next = 0;

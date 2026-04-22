@@ -12,11 +12,13 @@ use ratatui::{
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let opm_title = Line::from("WMATA Arrivals").bold();
+        let wmata_title = Line::from("WMATA Arrivals").bold();
         let hour_title = Line::from(vec![
-            "Next ".bold().into(),
-            self.appinfo.next_hours.to_string().bold().into(),
-            " Hour(s)".bold().into(),
+            Span::raw("Next "),
+            Span::raw(self.appinfo.next_hours.to_string())
+                .yellow()
+                .bold(),
+            Span::raw(" Hour(s)"),
         ]);
         let chart_title = Line::from("Hourly Temp Chart").bold();
 
@@ -25,10 +27,10 @@ impl Widget for &App {
         let footer_body = Line::from("spoofy ent").bold();
 
         let instructions = Line::from(vec![
-            " Quit ".into(),
-            " <Q> ".blue().bold(),
-            " Refresh ".into(),
-            " <R> ".blue().into(),
+            Span::raw("Quit "),
+            Span::raw("<Q>").blue().bold(),
+            Span::raw("  Refresh "),
+            Span::raw("<R>").blue(),
         ]);
 
         let outer_layout = Layout::default()
@@ -54,14 +56,26 @@ impl Widget for &App {
             ])
             .split(main_layout[0]);
 
-        let opm_body: Vec<Line> = self
-            .appinfo
-            .opm
+        // Render multi-station WMATA data with proper grouping
+        let wmata_lines = &self.appinfo.wmata_arrivals;
+        let wmata_body: Vec<Line> = wmata_lines
             .iter()
-            .enumerate()
-            .map(|(i, s)| {
-                let line = Line::from(s.as_str().bold());
-                if i == 0 { line.italic().green() } else { line }
+            .map(|line| {
+                let styled = Line::from(line.as_str().bold());
+                match line.as_str() {
+                    // Title line
+                    "WMATA Arrivals" => styled.yellow().bold(),
+                    // Station header lines
+                    l if l.starts_with("Station:") => styled.yellow().italic(),
+                    // Help/info lines
+                    l if l.contains("Set WMATA_API_KEY") || l.contains("no arrivals") => {
+                        styled.red().dim()
+                    }
+                    // Error lines
+                    l if l.contains("Error") || l.contains("failed") => styled.red(),
+                    // Regular arrival lines
+                    _ => styled,
+                }
             })
             .collect();
 
@@ -82,9 +96,9 @@ impl Widget for &App {
         };
 
         let current_body = Line::from(vec![
-            current_temp.to_string().bold().into(),
-            " at ".to_string().bold().into(),
-            current_clock.to_string().bold().into(),
+            Span::raw(current_temp.to_string()),
+            Span::raw(" at "),
+            Span::raw(current_clock.to_string()),
         ]);
 
         Paragraph::new(current_body)
@@ -199,12 +213,12 @@ impl Widget for &App {
                 .render(weather_layout[2], buf);
         }
 
-        Paragraph::new(opm_body)
+        Paragraph::new(wmata_body)
             .wrap(Wrap { trim: true })
             .left_aligned()
             .block(
                 Block::bordered()
-                    .title(opm_title.left_aligned().yellow())
+                    .title(wmata_title.left_aligned().yellow())
                     .border_set(border::THICK),
             )
             .render(main_layout[1], buf);

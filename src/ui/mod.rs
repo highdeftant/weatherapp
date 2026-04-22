@@ -16,7 +16,7 @@ pub struct AppInfo {
     hourly_time: Vec<String>,
     hourly_temp: Vec<f64>,
     current_time: Vec<String>,
-    opm: Vec<String>,
+    wmata_arrivals: Vec<String>,
 }
 
 impl App {
@@ -64,14 +64,13 @@ impl App {
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
-        match key_event.code {
-            KeyCode::Char('q') => self.exit(),
-            _ => {}
-        };
+        if let KeyCode::Char('q') = key_event.code {
+            self.exit();
+        }
     }
 
-    pub fn upd_opm(&mut self, opmstatus: Vec<String>) {
-        self.appinfo.opm = opmstatus;
+    pub fn upd_wmata_arrivals(&mut self, wmatastatus: Vec<String>) {
+        self.appinfo.wmata_arrivals = wmatastatus;
     }
 
     pub fn upd_current(&mut self, time: Vec<String>) {

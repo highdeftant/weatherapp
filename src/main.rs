@@ -4,14 +4,12 @@ mod weather;
 mod weatherconv;
 
 use crate::{
-    api::wmataapi::status_lines_from_env,
+    api::wmataapi::{fetch_all_stations, load_config_from_env},
     ui::App,
     weather::WeatherResponse,
     weatherconv::{get_current, get_hourly},
 };
-use color_eyre;
-use ratatui;
-use tokio::time::{Duration, interval};
+use tokio::time::{interval, Duration};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -21,8 +19,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal = ratatui::init();
     let mut app = App::default();
 
-    app.upd_opm(vec![
-        "Station: --".to_string(),
+    app.upd_wmata_arrivals(vec![
+        "WMATA Arrivals".to_string(),
         "Set WMATA_API_KEY to enable live arrivals".to_string(),
     ]);
 
@@ -55,9 +53,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
 
-                // fetch WMATA lines separately — don't block weather on WMATA failure
-                let wmata_lines = status_lines_from_env(&client, 6).await;
-                app.upd_opm(wmata_lines);
+                // fetch WMATA arrivals for all configured stations
+                let config = load_config_from_env(0);
+                let wmata_lines = fetch_all_stations(&client, &config).await;
+                app.upd_wmata_arrivals(wmata_lines);
             }
             _ = tokio::time::sleep(Duration::from_millis(75)) => {
                 app.tick(&mut terminal)?;
